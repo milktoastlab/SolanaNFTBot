@@ -1,15 +1,16 @@
 {
   "name": "@milktoast-lab/SolNFTBot",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "license": "MIT",
   "engines": {
     "node": ">=16.6"
   },
   "scripts": {
     "dev": "PORT=4000 ts-node src/server.ts",
-    "start": "PORT=4000 NODE_ENV=production ts-node src/server.ts",
+    "build": "tsc",
+    "start": "PORT=4000 NODE_PATH=./dist/src NODE_ENV=production node dist/src/server.js",
     "test": "jest --no-watchman",
     "lint-format": "prettier -c ./src/**/*.{ts,tsx}",
     "fix-format": "prettier -w ./src/**/*.{ts,tsx}"
