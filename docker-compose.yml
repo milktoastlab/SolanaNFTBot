@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  bot:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - SOLANA_RPC=https://explorer-api.mainnet-beta.solana.com/
+      - DISCORD_BOT_TOKEN=OTAxMjE5ODA2NzY4OTUxMzI2.YXMsWQ.jNgZjLXKbL0GscEo3m169YlYy1U
+      - DISCORD_CHANNEL_ID=893632559001530394
+      - MINT_ADDRESS=AmivaqHeZBgUZkzEZ44Mi9zQJruExZMP4PVRYduFVkaS
+
