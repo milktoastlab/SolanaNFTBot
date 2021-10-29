@@ -10,6 +10,7 @@ export function newConnection(): Connection {
 }
 
 interface Opt extends ConfirmedSignaturesForAddress2Options {
+  reverseOrder?: boolean;
   onTransaction?: (
     tx: ParsedConfirmedTransaction
   ) => Promise<Boolean | undefined>;
@@ -20,7 +21,7 @@ export async function fetchWeb3Transactions(
   account: string,
   opt?: Opt
 ): Promise<ParsedConfirmedTransaction[] | null> {
-  const signatures = await conn.getConfirmedSignaturesForAddress2(
+  let signatures = await conn.getConfirmedSignaturesForAddress2(
     new PublicKey(account),
     {
       limit: opt?.limit,
@@ -29,6 +30,10 @@ export async function fetchWeb3Transactions(
   );
   if (signatures) {
     const txs: ParsedConfirmedTransaction[] = [];
+    if (opt?.reverseOrder) {
+      signatures = signatures.reverse();
+    }
+
     for (let i = 0; i < signatures.length; i++) {
       const signature = signatures[i];
       const tx = await conn.getParsedConfirmedTransaction(signature.signature);

@@ -16,8 +16,7 @@ export default function newWorker(
   web3Conn: Connection,
   project: Project
 ): Worker {
-  // track the time so we only notify new transactions
-  let notifyAfter = new Date(Date.now() - 1000 * 60 * 60);
+  let notifyAfter = new Date(Date.now());
 
   return {
     async execute() {
@@ -37,10 +36,9 @@ export default function newWorker(
         return;
       }
 
-      let lastSoldAt: Date;
-
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
+        reverseOrder: true,
         async onTransaction(tx) {
           const nftSale = parseNFTSale(tx);
           if (!nftSale) {
@@ -49,12 +47,6 @@ export default function newWorker(
           if (nftSale.soldAt <= notifyAfter) {
             // ignore transactions before the last notify or last online time
             return false;
-          }
-          if (!lastSoldAt) {
-            lastSoldAt = nftSale.soldAt;
-          }
-          if (lastSoldAt < nftSale.soldAt) {
-            lastSoldAt = nftSale.soldAt;
           }
 
           const nftData = await fetchNFTData(web3Conn, nftSale.token);
@@ -66,15 +58,9 @@ export default function newWorker(
 
           await notifyDiscordSale(discordClient, channel, nftSale);
 
-          // only notify one
-          return false;
+          notifyAfter = nftSale.soldAt;
         },
       });
-
-      // @ts-ignore
-      if (lastSoldAt) {
-        notifyAfter = lastSoldAt;
-      }
     },
   };
 }
