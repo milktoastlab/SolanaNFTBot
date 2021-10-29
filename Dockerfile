@@ -18,5 +18,5 @@ COPY --from=builder /solananftbot/dist ./dist
 COPY --from=builder /solananftbot/node_modules ./node_modules
 COPY --from=builder /solananftbot/package.json ./package.json
 
-EXPOSE 3000
+EXPOSE 4000
 CMD ["yarn", "start"]

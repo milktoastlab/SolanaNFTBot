@@ -1,6 +1,17 @@
 import Discord, { MessageEmbed, TextChannel } from "discord.js";
 import { NFTSale } from "lib/marketplaces";
 
+const status: {
+  totalNotified: number;
+  lastNotified?: Date;
+} = {
+  totalNotified: 0,
+};
+
+export function getStatus() {
+  return status;
+}
+
 export default async function notifyDiscordSale(
   client: Discord.Client,
   channel: TextChannel,
@@ -9,20 +20,26 @@ export default async function notifyDiscordSale(
   if (!client.isReady()) {
     return;
   }
-  const description = `Sold for ${nftSale.getPriceInSOL()} SOL at Magic Eden`;
+
+  const { marketplace, nftData } = nftSale;
+  const description = `Sold for ${nftSale.getPriceInSOL()} SOL at ${
+    marketplace.name
+  }`;
   const embedMsg = new MessageEmbed({
     color: "#0099ff",
-    title: nftSale.nftData?.name,
+    title: nftData?.name,
     description,
-    url: `https://magiceden.io/item-details/${nftSale.token}`,
+    url: marketplace.itemURL(nftSale.token),
     thumbnail: {
-      url: nftSale.nftData?.image,
+      url: nftData?.image,
     },
   });
   await channel.send({
     embeds: [embedMsg],
   });
-  console.log(
-    `Notified discord #${channel.name}: ${nftSale.nftData?.name} - ${description}`
-  );
+  const logMsg = `Notified discord #${channel.name}: ${nftData?.name} - ${description}`;
+  console.log(logMsg);
+
+  status.lastNotified = new Date();
+  status.totalNotified++;
 }
