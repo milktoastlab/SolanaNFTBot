@@ -40,7 +40,8 @@ Make sure your bot has the required permissions:
 * Read/Send messages
 * Send messages
 * Embed links
-<img width="587" alt="Screen Shot 2021-10-31 at 9 30 56 am" src="https://user-images.githubusercontent.com/90617759/139560515-efd2f584-8f98-4337-a9ad-704b18581b22.png">
+
+<img width="827" alt="Screen Shot 2021-10-31 at 9 25 31 am" src="https://user-images.githubusercontent.com/90617759/139560537-e0420217-25d7-4538-81cc-d53422c24db9.png">
 
 #### SUBSCRIPTION_DISCORD_CHANNEL_ID
 This is the ID of the discord channel you want to send notifications to.
@@ -51,6 +52,8 @@ https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User
 #### SUBSCRIPTION_MINT_ADDRESS
 This is the address that you want the Solana NFT bot to watch for notifications.
 Ideally, it's the "Update Authority" address.
+
+<img width="587" alt="Screen Shot 2021-10-31 at 9 30 56 am" src="https://user-images.githubusercontent.com/90617759/139560515-efd2f584-8f98-4337-a9ad-704b18581b22.png">
 
 
 3. Run the server 
