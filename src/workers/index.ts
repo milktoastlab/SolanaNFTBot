@@ -2,34 +2,24 @@ import Discord from "discord.js";
 import { Worker } from "./types";
 import notifyNFTSalesWorker from "./notifyNFTSalesWorker";
 import { Connection } from "@solana/web3.js";
+import { MutableConfig } from "../config";
 
 const defaultInterval = 1000 * 60; // 1 minutes
 
 export default function initWorkers(
   discordClient: Discord.Client,
   web3Conn: Connection,
+  config: MutableConfig,
   interval: number = defaultInterval
 ) {
-  if (!process.env.MINT_ADDRESS) {
-    console.log("MINT_ADDRESS env not set");
-    return;
-  }
-  if (!process.env.DISCORD_CHANNEL_ID) {
-    console.log("DISCORD_CHANNEL_ID env not set");
-    return;
-  }
+  const workers: Worker[] = config.subscriptions.map((s) => {
+    return notifyNFTSalesWorker(discordClient, web3Conn, {
+      discordChannelId: s.discordChannelId,
+      mintAddress: s.mintAddress,
+    });
+  });
 
-  const workers: Worker[] = [
-    notifyNFTSalesWorker(discordClient, web3Conn, {
-      mintAddress: process.env.MINT_ADDRESS,
-      discordChannelId: process.env.DISCORD_CHANNEL_ID,
-    }),
-    // TODO
-    // notifyOffers,
-    // notifyAuctionBids,
-  ];
-
-  console.log("starting workers...");
+  console.log(`starting ${workers.length} worker(s)...`);
 
   const runWorkers = () => {
     try {

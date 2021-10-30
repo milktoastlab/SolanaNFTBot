@@ -16,8 +16,9 @@ export default function newWorker(
   web3Conn: Connection,
   project: Project
 ): Worker {
-  let notifyAfter = new Date(Date.now());
-
+  const timestamp = Date.now();
+  let notifyAfter = new Date(timestamp);
+  let lastNotified = new Date(timestamp);
   return {
     async execute() {
       if (!discordClient.isReady()) {
@@ -38,7 +39,6 @@ export default function newWorker(
 
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
-        reverseOrder: true,
         async onTransaction(tx) {
           const nftSale = parseNFTSale(tx);
           if (!nftSale) {
@@ -58,9 +58,12 @@ export default function newWorker(
 
           await notifyDiscordSale(discordClient, channel, nftSale);
 
-          notifyAfter = nftSale.soldAt;
+          if (nftSale.soldAt > lastNotified) {
+            lastNotified = nftSale.soldAt;
+          }
         },
       });
+      notifyAfter = lastNotified;
     },
   };
 }
