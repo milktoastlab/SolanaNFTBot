@@ -4,6 +4,7 @@ import initWorkers from "./workers";
 import { newConnection } from "lib/solana/connection";
 import dotenv from "dotenv";
 import { getStatus } from "lib/discord/notifyDiscordSale";
+import { loadConfig } from "./config";
 
 const port = process.env.PORT || 3000;
 
@@ -13,12 +14,17 @@ const port = process.env.PORT || 3000;
     if (result.error) {
       throw result.error;
     }
+    const config = loadConfig();
 
     const server = express();
     server.get("/", (req, res) => {
       const { totalNotified, lastNotified } = getStatus();
       res.send(`
       Total notifications sent: ${totalNotified}<br/>
+      ${config.subscriptions.map(
+        (s) =>
+          `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
+      )}
       ${lastNotified ? `Last notified at: ${lastNotified.toISOString()}` : ""}
       `);
     });
@@ -30,8 +36,7 @@ const port = process.env.PORT || 3000;
 
     const discordClient = await initDiscordClient();
     const web3Conn = newConnection();
-
-    initWorkers(discordClient, web3Conn);
+    initWorkers(discordClient, web3Conn, config);
   } catch (e) {
     console.error(e);
     process.exit(1);
