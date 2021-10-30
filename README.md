@@ -4,7 +4,7 @@ Solana NFT bot is a helpful bot for your Solana NFT projects.
 
 ## Features
 - [x] Notify discord channel on each purchase in marketplaces. 
-- [x] [Support major marketplaces](#Marketplace support) 
+- [x] [Support major marketplaces](#marketplace-support) 
 
 ## Running locally 
 ### Requirement
@@ -40,9 +40,7 @@ Make sure your bot has the required permissions:
 * Read/Send messages
 * Send messages
 * Embed links
-
-Example:
-https://discord.com/api/oauth2/authorize?client_id=901219806768951326&permissions=274877967360&scope=bot
+<img width="587" alt="Screen Shot 2021-10-31 at 9 30 56 am" src="https://user-images.githubusercontent.com/90617759/139560515-efd2f584-8f98-4337-a9ad-704b18581b22.png">
 
 #### SUBSCRIPTION_DISCORD_CHANNEL_ID
 This is the ID of the discord channel you want to send notifications to.
