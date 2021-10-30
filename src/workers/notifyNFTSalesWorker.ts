@@ -16,7 +16,7 @@ export default function newWorker(
   web3Conn: Connection,
   project: Project
 ): Worker {
-  let notifyAfter = new Date(Date.now());
+  let notifyAfter = new Date();
 
   return {
     async execute() {
