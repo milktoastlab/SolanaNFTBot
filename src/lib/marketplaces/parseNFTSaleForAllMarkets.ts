@@ -1,8 +1,10 @@
-import {NFTSale} from "./types";
+import { NFTSale } from "./types";
 import marketplaces from "./index";
-import {ParsedConfirmedTransaction} from "@solana/web3.js";
+import { ParsedConfirmedTransaction } from "@solana/web3.js";
 
-export default function parseNFTSale(tx: ParsedConfirmedTransaction): NFTSale | null {
+export default function parseNFTSaleForAllMarkets(
+  tx: ParsedConfirmedTransaction
+): NFTSale | null {
   for (let i = 0; i < marketplaces.length; i++) {
     const nftSale = marketplaces[i].parseNFTSale(tx);
     if (nftSale) {

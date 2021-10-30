@@ -1,9 +1,9 @@
 import magicEdenSaleTx from "./__fixtures__/magicEdenSaleTx";
-import parseNFTSale from "./parseNFTSale";
+import parseNFTSaleForAllMarkets from "./parseNFTSaleForAllMarkets";
 
 describe("parseNFTSale", () => {
   test("sale transaction should return NFTSale", () => {
-    const sale = parseNFTSale(magicEdenSaleTx);
+    const sale = parseNFTSaleForAllMarkets(magicEdenSaleTx);
     expect(sale?.transaction).toEqual(
       "626EgwuS6dbUKrkZujQCFjHiRsz92ALR5gNAEg2eMpZzEo88Cci6HifpDFcvgYR8j88nXUq1nRUA7UDRdvB7Y6WD"
     );
@@ -17,6 +17,6 @@ describe("parseNFTSale", () => {
         preTokenBalances: [],
       },
     };
-    expect(parseNFTSale(invalidSaleTx)).toBe(null);
+    expect(parseNFTSaleForAllMarkets(invalidSaleTx)).toBe(null);
   });
 });
