@@ -20,12 +20,17 @@ const port = process.env.PORT || 3000;
     server.get("/", (req, res) => {
       const { totalNotified, lastNotified } = getStatus();
       res.send(`
-      Total notifications sent: ${totalNotified}<br/>
       ${config.subscriptions.map(
         (s) =>
           `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
       )}
-      ${lastNotified ? `Last notified at: ${lastNotified.toISOString()}` : ""}
+      Total notifications sent: ${totalNotified}<br/>
+      ${
+        lastNotified
+          ? `Last notified at: ${lastNotified.toISOString()}<br/>`
+          : ""
+      }
+      ${`Current UTC time: ${new Date().toISOString()}`}
       `);
     });
 
