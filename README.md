@@ -34,15 +34,22 @@ yarn dev
 
 ### Instructions
 
-#### 1. Update .env with your secrets
+#### Run bot using docker compose in the terminal
 
-Follow the instructions [here](#configurable-environments)
-
-#### 2. Run bot using docker compose in the terminal
-In the terminal run the follow command in the repo directory:
+In the terminal, run the following command with `{placeholder}` replaced with your own configuration:
 
 ```
-docker-compose up bot
+docker run --name nftbot \
+ -d -p 4000:4000 -e DISCORD_BOT_TOKEN={placeholder} \
+ -e SUBSCRIPTION_DISCORD_CHANNEL_ID={placeholder} \
+ -e SUBSCRIPTION_MINT_ADDRESS={placeholder} \
+ milktoastlab/solananftbot
+```
+See [here](#configurable-environments) for more detail
+
+View logs
+```
+docker logs ntfbot
 ```
 
 ## Configurable environments
