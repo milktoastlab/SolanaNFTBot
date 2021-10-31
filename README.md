@@ -2,6 +2,12 @@
 
 Solana NFT bot is a helpful bot for your Solana NFT projects.
 
+This project is sponsored by [milktoast.world](https://milktoast.world):
+An NFT project that aims to spread happiness and cheer.
+
+<img src="https://user-images.githubusercontent.com/90617759/139604005-addc968d-2193-4e7b-9ac9-86622672391b.png" width=100>
+
+
 ## Features
 - [x] Notify discord channel on each purchase in marketplaces. 
 - [x] [Support major marketplaces](#marketplace-support) 
