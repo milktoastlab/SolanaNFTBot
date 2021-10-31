@@ -1,11 +1,8 @@
 version: "3.9"
 services:
   bot:
-    build: .
+    image: milktoastlab/solananftbot
     ports:
       - "4000:4000"
-    environment:
-      - SOLANA_RPC=https://explorer-api.mainnet-beta.solana.com/
-      - DISCORD_BOT_TOKEN=
-      - SUBSCRIPTION_DISCORD_CHANNEL_ID=
-      - SUBSCRIPTION_MINT_ADDRESS=
+    env_file:
+      - .env
