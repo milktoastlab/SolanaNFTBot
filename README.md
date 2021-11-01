@@ -12,6 +12,9 @@ An NFT project that aims to spread happiness and cheer.
 - [x] Notify discord channel on each purchase in marketplaces. 
 - [x] [Support major marketplaces](#marketplace-support) 
 
+<img width="508" alt="Screen Shot 2021-11-01 at 7 40 44 pm" src="https://user-images.githubusercontent.com/90617759/139645471-4b2aab1e-2fa2-4691-87ca-1707bc35b027.png">
+
+
 ## Running in development
 ### Requirement
 * Node >= 16.6
@@ -124,3 +127,7 @@ Use `src/lib/marketplaces/digitalEyes.test.ts` as example
 #### 3. Add the new marketplace to the existing list 
 `src/lib/marketplaces/marketplaces.ts`
 
+## Support
+
+If you have any questions or feedback, feel free to jump into our discord #dev-talk channel and have a chat.
+https://discord.com/invite/GYxur2tvzP
