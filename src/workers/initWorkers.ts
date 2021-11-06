@@ -2,7 +2,7 @@ import { Worker } from "./types";
 
 const defaultInterval = 1000 * 60; // 1 minutes
 
-export default function initWorkers(
+export default async function initWorkers(
   workers: Worker[],
   interval: number = defaultInterval
 ) {
@@ -12,16 +12,18 @@ export default function initWorkers(
 
   console.log(`starting ${workers.length} worker(s)...`);
 
-  const runWorkers = () => {
-    try {
-      workers.forEach((w) => {
-        w.execute();
-      });
-    } catch (e) {
-      console.warn(e);
-    }
+  const runWorkers = async () => {
+    const promises = workers.map(async (w) => {
+      try {
+        return await w.execute();
+      } catch (e) {
+        console.warn(e);
+      }
+    });
+
+    return Promise.all(promises);
   };
 
-  runWorkers();
+  const _ = runWorkers();
   setInterval(runWorkers, interval);
 }

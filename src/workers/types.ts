@@ -1,3 +1,3 @@
 export interface Worker {
-  execute: () => void;
+  execute: () => Promise<void>;
 }
