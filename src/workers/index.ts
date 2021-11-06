@@ -19,6 +19,10 @@ export default function initWorkers(
     });
   });
 
+  if (!workers.length) {
+    throw "Cannot init workers because no workers are configured: check env vars";
+  }
+
   console.log(`starting ${workers.length} worker(s)...`);
 
   const runWorkers = () => {
