@@ -56,7 +56,7 @@ describe("digitalEyes", () => {
       const nonMagicEdenSaleTx = {
         ...digitalEyesSaleTx,
       };
-      nonMagicEdenSaleTx.meta.logMessages[0] = "Program xxx invoke [1]";
+      nonMagicEdenSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
       expect(digitalEyes.parseNFTSale(nonMagicEdenSaleTx)).toBe(null);
     });
   });

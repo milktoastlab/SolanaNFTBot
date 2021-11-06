@@ -64,7 +64,7 @@ describe("solanart", () => {
       const nonMagicEdenSaleTx = {
         ...solanartSaleTx,
       };
-      nonMagicEdenSaleTx.meta.logMessages[0] = "Program xxx invoke [1]";
+      nonMagicEdenSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
       expect(solanart.parseNFTSale(nonMagicEdenSaleTx)).toBe(null);
     });
   });

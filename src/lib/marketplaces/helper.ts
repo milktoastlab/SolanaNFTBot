@@ -39,7 +39,11 @@ export function parseNFTSaleOnTx(
     return null;
   }
 
-  if (!txResp.meta.logMessages[0].includes(marketplace.programId)) {
+  if (
+    !txResp.meta.logMessages.filter((msg) =>
+      msg.includes(marketplace.programId)
+    ).length
+  ) {
     return null;
   }
   const { innerInstructions } = txResp.meta;
