@@ -38,12 +38,11 @@ export function parseNFTSaleOnTx(
   if (!txResp.meta?.logMessages) {
     return null;
   }
+  const transactionExecByMarketplaceProgram = txResp.meta.logMessages.filter(
+    (msg) => msg.includes(marketplace.programId)
+  ).length;
 
-  if (
-    !txResp.meta.logMessages.filter((msg) =>
-      msg.includes(marketplace.programId)
-    ).length
-  ) {
+  if (!transactionExecByMarketplaceProgram) {
     return null;
   }
   const { innerInstructions } = txResp.meta;
