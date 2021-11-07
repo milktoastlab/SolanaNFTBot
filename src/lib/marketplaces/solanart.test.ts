@@ -61,11 +61,11 @@ describe("solanart", () => {
       expect(solanart.parseNFTSale(invalidSaleTx)).toBe(null);
     });
     test("non Solanart transaction", () => {
-      const nonMagicEdenSaleTx = {
+      const invalidSaleTx = {
         ...solanartSaleTx,
       };
-      nonMagicEdenSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(solanart.parseNFTSale(nonMagicEdenSaleTx)).toBe(null);
+      invalidSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
+      expect(solanart.parseNFTSale(invalidSaleTx)).toBe(null);
     });
   });
 });

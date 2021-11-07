@@ -53,11 +53,11 @@ describe("digitalEyes", () => {
       expect(digitalEyes.parseNFTSale(invalidSaleTx)).toBe(null);
     });
     test("non Solanart transaction", () => {
-      const nonMagicEdenSaleTx = {
+      const invalidSaleTx = {
         ...digitalEyesSaleTx,
       };
-      nonMagicEdenSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(digitalEyes.parseNFTSale(nonMagicEdenSaleTx)).toBe(null);
+      invalidSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
+      expect(digitalEyes.parseNFTSale(invalidSaleTx)).toBe(null);
     });
   });
 });
