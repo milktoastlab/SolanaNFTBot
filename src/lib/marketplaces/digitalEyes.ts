@@ -3,7 +3,7 @@ import { parseNFTSaleOnTx } from "./helper";
 
 const digitalEyes: Marketplace = {
   name: "Digital Eyes",
-  programId: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  programId: "A7p8451ktDCHq5yYaHczeLMYsjRsAkzc3hCXcSrwYHU7",
   itemURL: (token: String) => `https://digitaleyes.market/item/${token}`,
   parseNFTSale(txResp): NFTSale | null {
     return parseNFTSaleOnTx(txResp, this, 1);
