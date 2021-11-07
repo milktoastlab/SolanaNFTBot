@@ -110,8 +110,8 @@ Ideally, it's the "Update Authority" address.
 - [x] [Magic Eden](https://magiceden.io/)
 - [x] [Solanart](http://solanart.io/)
 - [x] [Digital Eyes](https://digitaleyes.market/)
+- [x] [Alpha Art](https://alpha.art/)
 - [ ] [Solsea](https://solsea.io/)
-- [ ] [Alpha Art](https://alpha.art/)
 
 ### Adding new marketplace
 
