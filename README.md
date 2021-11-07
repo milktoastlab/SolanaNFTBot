@@ -121,7 +121,7 @@ Here is the instruction on how you can add support to other marketplaces.
 #### 1. Add a new marketplace config
 Use `src/lib/marketplaces/digitalEyes.ts` as example
 
-#### 2. Get write a test for the marketplace
+#### 2. Write a test for the marketplace
 Use `src/lib/marketplaces/digitalEyes.test.ts` as example
 
 #### 3. Add the new marketplace to the existing list 

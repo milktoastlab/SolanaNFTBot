@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
 import { initClient as initDiscordClient } from "lib/discord";
-import initWorkers from "./workers";
+import initWorkers from "workers/initWorkers";
 import { newConnection } from "lib/solana/connection";
 import dotenv from "dotenv";
 import { getStatus } from "lib/discord/notifyDiscordSale";
-import { loadConfig } from "./config";
+import { loadConfig } from "config";
+import { Worker } from "workers/types";
+import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 
 const port = process.env.PORT || 3000;
 
@@ -43,7 +45,15 @@ const port = process.env.PORT || 3000;
 
     const discordClient = await initDiscordClient();
     const web3Conn = newConnection();
-    initWorkers(discordClient, web3Conn, config);
+
+    const workers: Worker[] = config.subscriptions.map((s) => {
+      return notifyNFTSalesWorker(discordClient, web3Conn, {
+        discordChannelId: s.discordChannelId,
+        mintAddress: s.mintAddress,
+      });
+    });
+
+    initWorkers(workers);
   } catch (e) {
     console.error(e);
     process.exit(1);
