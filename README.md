@@ -14,28 +14,6 @@ An NFT project that aims to spread happiness and cheer.
 
 <img width="508" alt="Screen Shot 2021-11-01 at 7 40 44 pm" src="https://user-images.githubusercontent.com/90617759/139645471-4b2aab1e-2fa2-4691-87ca-1707bc35b027.png">
 
-
-## Running in development
-### Requirement
-* Node >= 16.6
-* Yarn
-
-### Instructions
-
-#### 1. Install dependencies
-```
-yarn install
-```
-
-#### 2. Update .env with your secrets
-
-Follow the instructions [here](#configurable-environments)
-
-#### 3. Run the server 
-```
-yarn dev
-```
-
 ## Running using docker
 
 ### Requirement
@@ -59,6 +37,27 @@ See [here](#configurable-environments) for more detail
 View logs
 ```
 docker logs ntfbot
+```
+
+## Running in development
+### Requirement
+* Node >= 16.6
+* Yarn
+
+### Instructions
+
+#### 1. Install dependencies
+```
+yarn install
+```
+
+#### 2. Update .env with your secrets
+
+Follow the instructions [here](#configurable-environments)
+
+#### 3. Run the server
+```
+yarn dev
 ```
 
 ## Configurable environments
