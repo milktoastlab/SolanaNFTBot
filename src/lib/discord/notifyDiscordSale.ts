@@ -22,7 +22,7 @@ export default async function notifyDiscordSale(
   }
 
   const { marketplace, nftData } = nftSale;
-  const description = `Sold for ${nftSale.getPriceInSOL()} SOL at ${
+  const description = `Sold for ${nftSale.getPriceInSOL()} S◎L at ${
     marketplace.name
   }`;
   const embedMsg = new MessageEmbed({
