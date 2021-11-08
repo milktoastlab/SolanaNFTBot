@@ -82,7 +82,14 @@ export function parseNFTSaleOnTx(
       }, 0);
     },
     getPriceInSOL() {
-      return this.getPriceInLamport() / LamportPerSOL;
+      // There are many cases that lamport stored contains floating points
+      // For example: https://explorer.solana.com/tx/5YHfVoe9jSBTa3FWcYV11i6MNtPALTpot1ca6PydLx4nGNyCPc7cghwbz6VXgAyMrxUZDkkp2QoYfot74ckLsUYG
+      // Generally, there should be no reason for the last digit of lamport not to be 0
+      // Rounding it here ensures we get a more accurate result for sale.
+      // That's what the explorers do.
+      const rounded = Math.round(this.getPriceInLamport() / 10) * 10;
+
+      return rounded / LamportPerSOL;
     },
     marketplace,
   };
