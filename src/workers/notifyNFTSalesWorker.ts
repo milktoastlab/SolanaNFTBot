@@ -6,7 +6,7 @@ import { parseNFTSale } from "lib/marketplaces";
 import { fetchNFTData } from "lib/solana/NFTData";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
 
-interface Project {
+export interface Project {
   mintAddress: string;
   discordChannelId: string;
 }
@@ -42,6 +42,10 @@ export default function newWorker(
         async onTransaction(tx) {
           const nftSale = parseNFTSale(tx);
           if (!nftSale) {
+            return;
+          }
+          // Don't notify purchases by the project's own account
+          if (nftSale.buyer === project.mintAddress) {
             return;
           }
           if (nftSale.soldAt <= notifyAfter) {

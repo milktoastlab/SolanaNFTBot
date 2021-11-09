@@ -38,6 +38,13 @@ export function parseNFTSaleOnTx(
   if (!txResp.meta?.logMessages) {
     return null;
   }
+  const buyer = txResp.transaction.message.accountKeys.find((k) => {
+    return k.signer;
+  });
+  if (!buyer) {
+    return null;
+  }
+
   const transactionExecByMarketplaceProgram = txResp.meta.logMessages.filter(
     (msg) => msg.includes(marketplace.programId)
   ).length;
@@ -73,6 +80,7 @@ export function parseNFTSaleOnTx(
 
   return {
     transaction: txResp.transaction.signatures[0],
+    buyer: buyer.pubkey.toString(),
     transfers,
     token,
     soldAt: new Date(txResp.blockTime * 1000),
