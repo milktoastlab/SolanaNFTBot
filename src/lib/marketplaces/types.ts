@@ -19,6 +19,7 @@ export interface Transfer {
 
 export interface NFTSale {
   transaction: string;
+  buyer: string;
   token: string;
   transfers: Transfer[];
   soldAt: Date;
