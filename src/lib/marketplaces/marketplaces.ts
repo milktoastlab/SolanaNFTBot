@@ -9,7 +9,7 @@ import solSea from "./solsea";
  * These are the list of marketplaces that we check for notifications
  */
 const marketplaces: Marketplace[] = [
-  magicEden,
+  // magicEden,
   digitalEyes,
   solanart,
   alphaArt,
