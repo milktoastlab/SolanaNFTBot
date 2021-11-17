@@ -33,7 +33,7 @@ export function getTransfersFromInnerInstructions(
 export function parseNFTSaleOnTx(
   txResp: ParsedConfirmedTransaction,
   marketplace: Marketplace,
-  transferInstructionIndex: number = 0
+  transferInstructionIndex?: number
 ): NFTSale | null {
   if (!txResp.meta?.logMessages) {
     return null;
@@ -52,11 +52,17 @@ export function parseNFTSaleOnTx(
   if (!transactionExecByMarketplaceProgram) {
     return null;
   }
+
   const { innerInstructions } = txResp.meta;
-  if (
-    !innerInstructions ||
-    innerInstructions.length < transferInstructionIndex + 1
-  ) {
+  if (!innerInstructions) {
+    return null;
+  }
+
+  // Use the last index of it's not set
+  if (typeof transferInstructionIndex == "undefined") {
+    transferInstructionIndex = innerInstructions.length - 1;
+  }
+  if (innerInstructions.length < transferInstructionIndex + 1) {
     return null;
   }
   if (!txResp?.blockTime) {
