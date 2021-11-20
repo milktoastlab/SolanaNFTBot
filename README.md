@@ -117,6 +117,7 @@ _Note: Avoid personal addresses because it could detect unwanted sales._
 - [x] [Solanart](http://solanart.io/)
 - [x] [Digital Eyes](https://digitaleyes.market/)
 - [x] [Alpha Art](https://alpha.art/)
+- [x] [Exchange Art](https://exchange.art/)
 - [ ] [Solsea](https://solsea.io/)
 
 ### Adding new marketplace
