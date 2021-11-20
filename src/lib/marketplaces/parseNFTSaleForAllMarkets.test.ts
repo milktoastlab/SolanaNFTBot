@@ -3,15 +3,20 @@ import parseNFTSaleForAllMarkets from "./parseNFTSaleForAllMarkets";
 import alphaArtSaleTx from "./__fixtures__/alphaArtSaleTx";
 import solanartSaleTx from "./__fixtures__/solanartSaleTx";
 import digitalEyeSaleTx from "./__fixtures__/digitalEyesSaleTx";
+import exchangeArtSaleTx from "./__fixtures__/exchangeArtSaleTx";
 
 describe("parseNFTSale", () => {
   test("sale transaction should return NFTSale", () => {
-    [magicEdenSaleTx, digitalEyeSaleTx, solanartSaleTx, alphaArtSaleTx].forEach(
-      (tx) => {
-        const sale = parseNFTSaleForAllMarkets(tx);
-        expect(sale?.transaction).toEqual(tx.transaction.signatures[0]);
-      }
-    );
+    [
+      magicEdenSaleTx,
+      digitalEyeSaleTx,
+      solanartSaleTx,
+      alphaArtSaleTx,
+      exchangeArtSaleTx,
+    ].forEach((tx) => {
+      const sale = parseNFTSaleForAllMarkets(tx);
+      expect(sale?.transaction).toEqual(tx.transaction.signatures[0]);
+    });
   });
 
   test("non-sale transaction should return null", () => {
