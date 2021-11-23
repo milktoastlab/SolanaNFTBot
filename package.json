@@ -9,9 +9,9 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "ts-run": "PORT=4000 ts-node src/server.ts",
+    "ts-run": "ts-node src/server.ts",
     "build": "tsc",
-    "start": "PORT=4000 NODE_PATH=./dist/src NODE_ENV=production node dist/src/server.js",
+    "start": "NODE_PATH=./dist/src NODE_ENV=production node dist/src/server.js",
     "test": "jest --no-watchman",
     "lint-format": "prettier -c ./src/**/*.{ts,tsx}",
     "fix-format": "prettier -w ./src/**/*.{ts,tsx}"
