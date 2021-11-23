@@ -24,18 +24,24 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 
 ### Instructions
 
-#### Run bot using docker compose in the terminal
+#### Run bot locally using docker in the terminal
 
-In the terminal, run the following command with `{placeholder}` replaced with your own configuration:
+Run the following command with your own secrets replaced with your own configuration:
 
 ```
-docker run --name nftbot \
- -d -p 4000:4000 -e DISCORD_BOT_TOKEN={placeholder} \
- -e SUBSCRIPTION_DISCORD_CHANNEL_ID={placeholder} \
- -e SUBSCRIPTION_MINT_ADDRESS={placeholder} \
- milktoastlab/solananftbot
+docker run --name nftbot -d -p 4000:4000 -e DISCORD_BOT_TOKEN=YOURDISCORDTOKEN -e SUBSCRIPTION_DISCORD_CHANNEL_ID=YOURCHANNELID -e SUBSCRIPTION_MINT_ADDRESS=YOURMINTADDRESS milktoastlab/solananftbot
 ```
-See [here](#configurable-environments) for more detail
+Note: The command above is tested in linux/unix env only. You may have a different experience in Windows.
+Please check the [documentation on how to run docker command in windows](https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/run-your-first-container) if you need any help.
+
+Alternatively, you can run it using docker-compose:
+
+Update `.env` with your secret and run
+```
+docker-compose up bot
+```
+
+See [here](#configurable-environments) for more details on environment variables
 
 View logs
 ```
