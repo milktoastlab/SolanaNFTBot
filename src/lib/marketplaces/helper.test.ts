@@ -7,10 +7,12 @@ import solanartSaleTx from "./__fixtures__/solanartSaleTx";
 import alphaArtSaleTx from "./__fixtures__/alphaArtSaleTx";
 import exchangeArtSaleTx from "./__fixtures__/exchangeArtSaleTx";
 import exchangeArtSaleTxV2 from "./__fixtures__/exchangeArtSaleTxV2";
+import solseaSaleTx from "./__fixtures__/solseaSaleTx";
 import magicEden from "./magicEden";
 import digitalEyes from "./digitalEyes";
 import alphaArt from "./alphaArt";
 import exchangeArt from "./exchangeArt";
+import solsea from "./solsea";
 
 describe("helper", () => {
   describe("parseNFTSaleOnTx", () => {
@@ -122,6 +124,7 @@ describe("helper", () => {
         { tx: solanartSaleTx, martketplace: solanart, shouldParsed: true },
         { tx: solanartSaleTx, martketplace: digitalEyes, shouldParsed: false },
         { tx: alphaArtSaleTx, martketplace: alphaArt, shouldParsed: true },
+        { tx: solseaSaleTx, martketplace: solsea, shouldParsed: true },
         {
           tx: exchangeArtSaleTx,
           martketplace: exchangeArt,

@@ -124,7 +124,7 @@ _Note: Avoid personal addresses because it could detect unwanted sales._
 - [x] [Digital Eyes](https://digitaleyes.market/)
 - [x] [Alpha Art](https://alpha.art/)
 - [x] [Exchange Art](https://exchange.art/)
-- [ ] [Solsea](https://solsea.io/)
+- [x] [Solsea](https://solsea.io/)
 
 ### Adding new marketplace
 
@@ -132,10 +132,10 @@ SolanaNFTBot aim to support as many marketplaces are possible.
 Here is the instruction on how you can add support to other marketplaces.
 
 #### 1. Add a new marketplace config
-Use `src/lib/marketplaces/digitalEyes.ts` as example
+Use `src/lib/marketplaces/solsea.ts` as example
 
 #### 2. Write a test for the marketplace
-Use `src/lib/marketplaces/digitalEyes.test.ts` as example
+Use `src/lib/marketplaces/solsea.test.ts` as example
 
 #### 3. Add the new marketplace to the existing list 
 `src/lib/marketplaces/marketplaces.ts`
