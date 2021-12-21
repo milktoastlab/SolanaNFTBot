@@ -1,6 +1,6 @@
 import Discord, { TextChannel } from "discord.js";
 import { Worker } from "./types";
-import { Connection } from "@solana/web3.js";
+import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
 import { parseNFTSale } from "lib/marketplaces";
 import { fetchNFTData } from "lib/solana/NFTData";
@@ -11,6 +11,15 @@ export interface Project {
   discordChannelId: string;
 }
 
+function getSignatureFromTx(
+  tx?: ParsedConfirmedTransaction
+): string | undefined {
+  if (tx) {
+    return tx.transaction.signatures[0];
+  }
+  return undefined;
+}
+
 export default function newWorker(
   discordClient: Discord.Client,
   web3Conn: Connection,
@@ -18,7 +27,12 @@ export default function newWorker(
 ): Worker {
   const timestamp = Date.now();
   let notifyAfter = new Date(timestamp);
-  let lastNotified = new Date(timestamp);
+
+  /**
+   * This var keeps track of the latest tx so we can optimize the rpc call
+   */
+  let latestParsedTx: ParsedConfirmedTransaction | undefined;
+
   return {
     async execute() {
       if (!discordClient.isReady()) {
@@ -36,10 +50,17 @@ export default function newWorker(
         console.warn("Channel must be a TextChannel");
         return;
       }
-
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
+        until: getSignatureFromTx(latestParsedTx),
         async onTransaction(tx) {
+          latestParsedTx = tx;
+
+          const txCreatedAt = new Date((tx.blockTime || 0) * 1000);
+          if (notifyAfter > txCreatedAt) {
+            return;
+          }
+
           const nftSale = parseNFTSale(tx);
           if (!nftSale) {
             return;
@@ -47,10 +68,6 @@ export default function newWorker(
           // Don't notify purchases by the project's own account
           if (nftSale.buyer === project.mintAddress) {
             return;
-          }
-          if (nftSale.soldAt <= notifyAfter) {
-            // ignore transactions before the last notify or last online time
-            return false;
           }
 
           const nftData = await fetchNFTData(web3Conn, nftSale.token);
@@ -62,12 +79,9 @@ export default function newWorker(
 
           await notifyDiscordSale(discordClient, channel, nftSale);
 
-          if (nftSale.soldAt > lastNotified) {
-            lastNotified = nftSale.soldAt;
-          }
+          notifyAfter = nftSale.soldAt;
         },
       });
-      notifyAfter = lastNotified;
     },
   };
 }

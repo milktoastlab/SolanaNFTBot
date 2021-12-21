@@ -10,9 +10,7 @@ export function newConnection(): Connection {
 }
 
 interface Opt extends ConfirmedSignaturesForAddress2Options {
-  onTransaction?: (
-    tx: ParsedConfirmedTransaction
-  ) => Promise<Boolean | undefined>;
+  onTransaction?: (tx: ParsedConfirmedTransaction) => Promise<void>;
 }
 
 export async function fetchWeb3Transactions(
@@ -25,20 +23,23 @@ export async function fetchWeb3Transactions(
     {
       limit: opt?.limit,
       before: opt?.before,
+      until: opt?.until,
     }
   );
+
   if (signatures) {
     const txs: ParsedConfirmedTransaction[] = [];
+    const oldestToLatest = signatures.reverse();
 
-    for (let i = 0; i < signatures.length; i++) {
-      const signature = signatures[i];
+    for (let i = 0; i < oldestToLatest.length; i++) {
+      const signature = oldestToLatest[i];
       const tx = await conn.getParsedConfirmedTransaction(signature.signature);
-      if (tx) {
-        if (opt?.onTransaction && (await opt?.onTransaction(tx)) === false) {
-          return txs;
-        }
-        txs.push(tx);
+      if (!tx) {
+        continue;
       }
+      opt?.onTransaction && (await opt.onTransaction(tx));
+
+      txs.push(tx);
     }
     return txs;
   }
