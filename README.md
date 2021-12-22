@@ -21,6 +21,11 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 
 ### Requirement
 * [docker](https://www.docker.com/products/docker-desktop) >= v20.10
+* A Solana RPC node/server - This is need so the bot know where to call to fetch solana transactions.
+Here are some potential routes to get a node:
+  * https://quicknode.com/
+  * [Run your own](https://medium.com/@MisterKevin_js/how-to-run-your-own-solana-rpc-endpoint-on-figments-datahub-e9ca881bebb7)
+
 
 ### Instructions
 
@@ -74,8 +79,8 @@ yarn dev
 Here are a list of environments you need to configure before running the NFT bot.
 
 ```sh
-# Replace this with your RPC
-SOLANA_RPC=https://explorer-api.mainnet-beta.solana.com/
+# RPC node url
+SOLANA_RPC=
 # Discord bot secret
 DISCORD_BOT_TOKEN=
 # The discord channel to notify
