@@ -113,10 +113,7 @@ https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User
 
 #### SUBSCRIPTION_MINT_ADDRESS
 This is the address that you want the Solana NFT bot to watch for notifications.
-Ideally, it's the "Update Authority" address.
-
-<img width="587" alt="Screen Shot 2021-10-31 at 9 30 56 am" src="https://user-images.githubusercontent.com/90617759/139560515-efd2f584-8f98-4337-a9ad-704b18581b22.png">
-OR one of the creator addresses:
+It needs to be one of the creator addresses:
 <img width="324" alt="Screen Shot 2021-11-12 at 6 16 31 pm" src="https://user-images.githubusercontent.com/90617759/141426468-fcf7c522-4480-4a4e-b1e9-c0cbed3f4f10.png">
 
 _Note: Avoid personal addresses because it could detect unwanted sales._
