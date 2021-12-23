@@ -26,7 +26,6 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 Here are some potential routes to get a node:
   * https://quicknode.com/
   * [Run your own](https://medium.com/@MisterKevin_js/how-to-run-your-own-solana-rpc-endpoint-on-figments-datahub-e9ca881bebb7)
-  * Browse the internet
 
 
 
