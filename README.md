@@ -20,37 +20,48 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 ## Running using docker
 
 ### Requirement
-* [docker](https://www.docker.com/products/docker-desktop) >= v20.10
-* A Solana RPC node/server - This is need so the bot know where to call to fetch solana transactions.
+* [Docker](https://www.docker.com/products/docker-desktop) >= v20.10
+  * If you're new to Docker, we recommend going through their [get started page](https://docs.docker.com/get-started/) to gain a basic understanding of Docker before moving forward.
+* A Solana RPC node/server - This is needed so the bot know where to call to fetch solana transactions.
 Here are some potential routes to get a node:
   * https://quicknode.com/
   * [Run your own](https://medium.com/@MisterKevin_js/how-to-run-your-own-solana-rpc-endpoint-on-figments-datahub-e9ca881bebb7)
+  * Browse the internet
+
 
 
 ### Instructions
 
 #### Run bot locally using docker in the terminal
 
+If you're new to docker, before starting I recommend 
+
 Run the following command with your own secrets replaced with your own configuration:
 
 ```
-docker run --name nftbot -d -p 4000:4000 -e DISCORD_BOT_TOKEN=YOURDISCORDTOKEN -e SUBSCRIPTION_DISCORD_CHANNEL_ID=YOURCHANNELID -e SUBSCRIPTION_MINT_ADDRESS=YOURMINTADDRESS milktoastlab/solananftbot
+docker run --name nftbot -d -p 4000:4000 -e SOLANA_RPC=YOURRPCURL -e DISCORD_BOT_TOKEN=YOURDISCORDTOKEN -e SUBSCRIPTION_DISCORD_CHANNEL_ID=YOURCHANNELID -e SUBSCRIPTION_MINT_ADDRESS=YOURMINTADDRESS milktoastlab/solananftbot
 ```
 Note: The command above is tested in linux/unix env only. You may have a different experience in Windows.
 Please check the [documentation on how to run docker command in windows](https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/run-your-first-container) if you need any help.
+
+View logs
+```
+docker logs ntfbot
+```
+
 
 Alternatively, you can run it using docker-compose:
 
 Update `.env` with your secret and run
 ```
-docker-compose up bot
+docker-compose up -d bot
 ```
 
 See [here](#configurable-environments) for more details on environment variables
 
 View logs
 ```
-docker logs ntfbot
+docker-compose logs bot
 ```
 
 ## Running in development
