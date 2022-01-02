@@ -1,5 +1,9 @@
-import { ParsedConfirmedTransaction, ParsedInstruction } from "@solana/web3.js";
-import { Marketplace, NFTSale, Transfer } from "./types";
+import {
+  ParsedConfirmedTransaction,
+  ParsedConfirmedTransactionMeta,
+  ParsedInstruction,
+} from "@solana/web3.js";
+import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
 
 export function getTransfersFromInnerInstructions(
@@ -30,6 +34,35 @@ export function getTransfersFromInnerInstructions(
     });
 }
 
+function getTokenDestinationFromTx(
+  tx: ParsedConfirmedTransaction
+): string | undefined {
+  if (!tx.meta?.postTokenBalances?.length) {
+    return;
+  }
+
+  const destinationBalance = tx.meta?.postTokenBalances.find(
+    (balance) => (balance.uiTokenAmount.uiAmount || 0) > 0
+  );
+  if (destinationBalance) {
+    return destinationBalance.owner;
+  }
+
+  return;
+}
+
+function getTokenFromMeta(
+  meta: ParsedConfirmedTransactionMeta
+): string | undefined {
+  if (meta.preTokenBalances && meta.preTokenBalances[0]?.mint) {
+    return meta.preTokenBalances[0]?.mint;
+  }
+  if (meta.postTokenBalances && meta.postTokenBalances[0]?.mint) {
+    return meta.postTokenBalances[0]?.mint;
+  }
+  return;
+}
+
 export function parseNFTSaleOnTx(
   txResp: ParsedConfirmedTransaction,
   marketplace: Marketplace,
@@ -38,11 +71,22 @@ export function parseNFTSaleOnTx(
   if (!txResp.meta?.logMessages) {
     return null;
   }
-  const buyer = txResp.transaction.message.accountKeys.find((k) => {
+  const signer = txResp.transaction.message.accountKeys.find((k) => {
     return k.signer;
   });
-  if (!buyer) {
+  if (!signer) {
     return null;
+  }
+
+  // Setting the signer as the default buyer and direct purchases as the default fallback
+  // It's true in most cases
+  let buyer = signer.pubkey.toString();
+  let buyMethod = SaleMethod.Direct;
+
+  const tokenDestination = getTokenDestinationFromTx(txResp);
+  if (tokenDestination && tokenDestination !== buyer) {
+    buyer = tokenDestination;
+    buyMethod = SaleMethod.Bid;
   }
 
   const transactionExecByMarketplaceProgram = txResp.meta.logMessages.filter(
@@ -68,11 +112,11 @@ export function parseNFTSaleOnTx(
   if (!txResp?.blockTime) {
     return null;
   }
-  if (!txResp.meta?.preTokenBalances) {
+  if (!txResp.meta) {
     return null;
   }
 
-  const token = txResp.meta?.preTokenBalances[0]?.mint;
+  const token = getTokenFromMeta(txResp.meta);
   if (!token) {
     return null;
   }
@@ -86,7 +130,8 @@ export function parseNFTSaleOnTx(
 
   return {
     transaction: txResp.transaction.signatures[0],
-    buyer: buyer.pubkey.toString(),
+    buyer,
+    method: buyMethod,
     transfers,
     token,
     soldAt: new Date(txResp.blockTime * 1000),

@@ -22,6 +22,9 @@ describe("exchangeArt", () => {
       expect(sale.marketplace).toEqual(exchangeArt);
       expect(sale.getPriceInLamport()).toEqual(1990000000);
       expect(sale.getPriceInSOL()).toEqual(1.99);
+      expect(sale.buyer).toEqual(
+        "8WX1T8ofK91YxcPHp9t1wnQanHfcu4Nzy3fwQqMNGecJ"
+      );
 
       const expectedTransfers = [
         {
@@ -58,6 +61,9 @@ describe("exchangeArt", () => {
       expect(sale.marketplace).toEqual(exchangeArt);
       expect(sale.getPriceInLamport()).toEqual(200000000);
       expect(sale.getPriceInSOL()).toEqual(0.2);
+      expect(sale.buyer).toEqual(
+        "FR4xWcvhxA2dLTDda5cmD1zUxz9gnzrVhhLq4owcAzt3"
+      );
 
       const expectedTransfers = [
         {
@@ -90,6 +96,7 @@ describe("exchangeArt", () => {
         meta: {
           ...exchangeArtSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(exchangeArt.parseNFTSale(invalidSaleTx)).toBe(null);

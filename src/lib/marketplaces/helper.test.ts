@@ -112,6 +112,7 @@ describe("helper", () => {
         meta: {
           ...magicEdenSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
 

@@ -1,5 +1,6 @@
 import solanart from "./solanart";
 import solanartSaleTx from "./__fixtures__/solanartSaleTx";
+import solanartSaleFromBidTx from "./__fixtures__/solanartSaleFromBidTx";
 
 describe("solanart", () => {
   test("itemUrl", () => {
@@ -50,12 +51,22 @@ describe("solanart", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
     });
+    test("bidding sale transaction should return NFTSale", () => {
+      const sale = solanart.parseNFTSale(solanartSaleFromBidTx);
+      expect(sale.transaction).toEqual(
+        "56QWjtsUykb2cxytM1jwJQmuLjtgZjs7jCZMARYBiCRCy8mEwVXqBFgBhvraDSzA27dUFRxX7Zi5VB4mxvjofXqR"
+      );
+      expect(sale.token).toEqual(
+        "HRGYe4hDNjNVCjmwhmnEiiZtbjzShCwazC1JEyERXRUo"
+      );
+    });
     test("non-sale transaction should return null", () => {
       const invalidSaleTx = {
         ...solanartSaleTx,
         meta: {
           ...solanartSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(solanart.parseNFTSale(invalidSaleTx)).toBe(null);

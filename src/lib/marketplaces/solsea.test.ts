@@ -29,6 +29,7 @@ describe("solsea", () => {
         meta: {
           ...solseaSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(solsea.parseNFTSale(invalidSaleTx)).toBe(null);

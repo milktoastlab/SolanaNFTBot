@@ -6,7 +6,7 @@ const solanart: Marketplace = {
   programId: "CJsLwbP1iu5DuUikHEJnLfANgKy6stB2uFgvBBHoyxwz",
   itemURL: (token: String) => `https://solscan.io/token/${token}`,
   parseNFTSale(txResp): NFTSale | null {
-    return parseNFTSaleOnTx(txResp, this, 1);
+    return parseNFTSaleOnTx(txResp, this);
   },
 };
 

@@ -19,6 +19,9 @@ describe("alphaArt", () => {
       expect(sale.marketplace).toEqual(alphaArt);
       expect(sale.getPriceInLamport()).toEqual(780000000);
       expect(sale.getPriceInSOL()).toEqual(0.78);
+      expect(sale.buyer).toEqual(
+        "CScUB4iBTfCWaFkj5gRpXx42HVpAgDvPJgbQxtETRXi1"
+      );
     });
     test("non-sale transaction should return null", () => {
       const invalidSaleTx = {
@@ -26,6 +29,7 @@ describe("alphaArt", () => {
         meta: {
           ...alphaArtSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(alphaArt.parseNFTSale(invalidSaleTx)).toBe(null);

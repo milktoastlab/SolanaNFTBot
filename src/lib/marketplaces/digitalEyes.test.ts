@@ -48,6 +48,7 @@ describe("digitalEyes", () => {
         meta: {
           ...digitalEyesSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(digitalEyes.parseNFTSale(invalidSaleTx)).toBe(null);

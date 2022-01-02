@@ -27,6 +27,7 @@ describe("parseNFTSale", () => {
       meta: {
         ...magicEdenSaleTx.meta,
         preTokenBalances: [],
+        postTokenBalances: [],
       },
     };
     expect(parseNFTSaleForAllMarkets(invalidSaleTx)).toBe(null);

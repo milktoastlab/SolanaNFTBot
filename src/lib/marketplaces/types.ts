@@ -1,6 +1,11 @@
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import NFTData from "lib/solana/NFTData";
 
+export enum SaleMethod {
+  Direct = "direct",
+  Bid = "bid",
+}
+
 export interface Marketplace {
   name: string;
   programId: string;
@@ -20,6 +25,7 @@ export interface Transfer {
 export interface NFTSale {
   transaction: string;
   buyer: string;
+  method: SaleMethod;
   token: string;
   transfers: Transfer[];
   soldAt: Date;

@@ -1,5 +1,7 @@
 import magicEden from "./magicEden";
 import magicEdenSaleTx from "./__fixtures__/magicEdenSaleTx";
+import magicEdenSaleFromBidTx from "./__fixtures__/magicEdenSaleFromBidTx";
+import { SaleMethod } from "./types";
 
 describe("magicEden", () => {
   test("itemUrl", () => {
@@ -87,6 +89,20 @@ describe("magicEden", () => {
         expect(transfer.to).toEqual(expectedTransfer.to);
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
+      expect(sale.method).toEqual(SaleMethod.Direct);
+    });
+    test("bidding sale transaction should return NFTSale", () => {
+      const sale = magicEden.parseNFTSale(magicEdenSaleFromBidTx);
+      expect(sale.transaction).toEqual(
+        "1cSgCBgot6w4KevVvsZc2PiST16BsEh9KAvmnbsSC9xXvput4SXLoq5pneQfczQEBw3jjcdmupG7Gp6MjG5MLzy"
+      );
+      expect(sale.token).toEqual(
+        "3SxS8hpvZ6BfHXwaURJAhtxXWbwnkUGA7HPV3b7uLnjN"
+      );
+      expect(sale.buyer).toEqual(
+        "2fT7A7iKwDodPj5rm4u4tXRFny9JY1ttHhHGp1PsvsAn"
+      );
+      expect(sale.method).toEqual(SaleMethod.Bid);
     });
     test("non-sale transaction should return null", () => {
       const invalidSaleTx = {
@@ -94,6 +110,7 @@ describe("magicEden", () => {
         meta: {
           ...magicEdenSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
       expect(magicEden.parseNFTSale(invalidSaleTx)).toBe(null);
