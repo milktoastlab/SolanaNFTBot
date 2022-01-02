@@ -42,11 +42,14 @@ function getTokenDestinationFromTx(
     return;
   }
 
-  const destinationBalance = tx.meta?.postTokenBalances.find(
-    (balance) => (balance.uiTokenAmount.uiAmount || 0) > 0
-  );
+  const destinationBalance = tx.meta?.postTokenBalances.find((balance) => {
+    if (!balance.uiTokenAmount.uiAmount) {
+      return false;
+    }
+    return balance.uiTokenAmount.uiAmount > 0;
+  });
   if (destinationBalance) {
-    return destinationBalance.owner;
+    return (destinationBalance as TokenBalance & { owner?: string }).owner;
   }
 
   return;
