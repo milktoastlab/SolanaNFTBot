@@ -1,5 +1,5 @@
 import Discord, { MessageEmbed, TextChannel } from "discord.js";
-import { NFTSale } from "lib/marketplaces";
+import { NFTSale, SaleMethod } from "lib/marketplaces";
 
 const status: {
   totalNotified: number;
@@ -20,11 +20,12 @@ export default async function notifyDiscordSale(
   if (!client.isReady()) {
     return;
   }
-
   const { marketplace, nftData } = nftSale;
-  const description = `Sold for ${nftSale.getPriceInSOL()} S◎L at ${
-    marketplace.name
-  }`;
+
+  const description = `Sold ${
+    nftSale.method === SaleMethod.Bid ? "via bidding " : ""
+  }for ${nftSale.getPriceInSOL()} S◎L at ${marketplace.name}`;
+
   const embedMsg = new MessageEmbed({
     color: "#0099ff",
     title: nftData?.name,

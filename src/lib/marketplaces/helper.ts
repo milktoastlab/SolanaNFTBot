@@ -2,6 +2,7 @@ import {
   ParsedConfirmedTransaction,
   ParsedConfirmedTransactionMeta,
   ParsedInstruction,
+  TokenBalance,
 } from "@solana/web3.js";
 import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
