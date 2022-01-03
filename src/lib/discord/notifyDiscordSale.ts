@@ -15,7 +15,8 @@ export function getStatus() {
 export default async function notifyDiscordSale(
   client: Discord.Client,
   channel: TextChannel,
-  nftSale: NFTSale
+  nftSale: NFTSale,
+  test?: boolean
 ) {
   if (!client.isReady()) {
     return;
@@ -41,6 +42,8 @@ export default async function notifyDiscordSale(
   const logMsg = `Notified discord #${channel.name}: ${nftData?.name} - ${description}`;
   console.log(logMsg);
 
-  status.lastNotified = new Date();
-  status.totalNotified++;
+  if (!test) {
+    status.lastNotified = new Date();
+    status.totalNotified++;
+  }
 }

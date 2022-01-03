@@ -1,9 +1,12 @@
 import express, { Request, Response } from "express";
-import { initClient as initDiscordClient } from "lib/discord";
+import {
+  fetchDiscordChannel,
+  initClient as initDiscordClient,
+} from "lib/discord";
 import initWorkers from "workers/initWorkers";
 import { newConnection } from "lib/solana/connection";
 import dotenv from "dotenv";
-import { getStatus } from "lib/discord/notifyDiscordSale";
+import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
 import { loadConfig } from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
@@ -21,6 +24,7 @@ const port = process.env.PORT || 4000;
     const config = loadConfig();
 
     const web3Conn = newConnection();
+    const discordClient = await initDiscordClient();
 
     const server = express();
     server.get("/", (req, res) => {
@@ -40,7 +44,7 @@ const port = process.env.PORT || 4000;
       `);
     });
 
-    server.get("/parse-sale-tx", async (req, res) => {
+    server.get("/test-sale-tx", async (req, res) => {
       const signature = (req.query["signature"] as string) || "";
       if (!signature) {
         res.send(`no signature in query param`);
@@ -66,6 +70,16 @@ const port = process.env.PORT || 4000;
         );
         return;
       }
+
+      const channelId = (req.query["channelId"] as string) || "";
+
+      if (channelId) {
+        const channel = await fetchDiscordChannel(discordClient, channelId);
+        if (channel) {
+          await notifyDiscordSale(discordClient, channel, nftSale);
+        }
+      }
+
       res.send(`NFT Sales parsed: \n${JSON.stringify(nftSale)}`);
     });
 
@@ -75,8 +89,6 @@ const port = process.env.PORT || 4000;
         `> Ready on http://localhost:${port} - env ${process.env.NODE_ENV}`
       );
     });
-
-    const discordClient = await initDiscordClient();
 
     const workers: Worker[] = config.subscriptions.map((s) => {
       return notifyNFTSalesWorker(discordClient, web3Conn, {
