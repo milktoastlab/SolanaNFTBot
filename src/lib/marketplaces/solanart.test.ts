@@ -16,7 +16,9 @@ describe("solanart", () => {
   const conn = new Connection("https://test/");
 
   test("itemUrl", () => {
-    expect(solanart.itemURL("xxx1")).toEqual("https://solscan.io/token/xxx1");
+    expect(solanart.itemURL("xxx1")).toEqual(
+      "https://solanart.io/search/?token=xxx1"
+    );
   });
 
   describe("parseNFTSale", () => {
