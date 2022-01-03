@@ -66,7 +66,7 @@ describe("solanart", () => {
     test("bidding sale transaction should return NFTSale", async () => {
       const sale = await solanart.parseNFTSale(conn, solanartSaleFromBidTx);
       expect(sale.transaction).toEqual(
-        "56QWjtsUykb2cxytM1jwJQmuLjtgZjs7jCZMARYBiCRCy8mEwVXqBFgBhvraDSzA27dUFRxX7Zi5VB4mxvjofXqR"
+        "4PJ7X1ZCEj68n2HXfVx48jGnqgu9rWAxquVihpNvDizbZ5V5vUHViz2N54HHMUiBvKtx7mbmYAQ4unURg9YEgLM6"
       );
       expect(sale.token).toEqual(
         "HRGYe4hDNjNVCjmwhmnEiiZtbjzShCwazC1JEyERXRUo"
@@ -75,6 +75,7 @@ describe("solanart", () => {
       expect(sale.buyer).toEqual(
         "6bPDVYs5Ewutp8jqurwqfWkL3UeUAGouZg5RJxNY2yAM"
       );
+      expect(sale.getPriceInSOL()).toEqual(4.5);
     });
     test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {

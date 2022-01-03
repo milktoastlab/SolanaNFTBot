@@ -3,11 +3,13 @@ import {
   ParsedConfirmedTransaction,
   ParsedConfirmedTransactionMeta,
   ParsedInstruction,
+  ParsedMessageAccount,
   TokenBalance,
 } from "@solana/web3.js";
 import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
 import { fetchNFTData } from "../solana/NFTData";
+import solanart from "./solanart";
 
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
@@ -69,6 +71,34 @@ function getTokenFromMeta(
   return;
 }
 
+function getPriceInLamportForSolanaArt(
+  { preBalances, postBalances }: ParsedConfirmedTransactionMeta,
+  accountKeys: ParsedMessageAccount[],
+  buyer: string
+): number {
+  const transferValues = accountKeys.reduce(
+    (transferValues, current, currentIndex, arr) => {
+      const value = Math.abs(
+        postBalances[currentIndex] - preBalances[currentIndex]
+      );
+
+      if (current.pubkey.toString() === buyer) {
+        transferValues.buyerTransfer = value;
+      }
+      transferValues.highestTransfer = Math.max(
+        transferValues.highestTransfer,
+        value
+      );
+      return transferValues;
+    },
+    {
+      highestTransfer: 0,
+      buyerTransfer: 0,
+    }
+  );
+  return transferValues.highestTransfer - transferValues.buyerTransfer;
+}
+
 export async function parseNFTSaleOnTx(
   web3Conn: Connection,
   txResp: ParsedConfirmedTransaction,
@@ -103,8 +133,16 @@ export async function parseNFTSaleOnTx(
   if (!transactionExecByMarketplaceProgram) {
     return null;
   }
+  if (!txResp?.blockTime) {
+    return null;
+  }
+  if (!txResp.meta) {
+    return null;
+  }
 
-  const { innerInstructions } = txResp.meta;
+  const {
+    meta: { innerInstructions },
+  } = txResp;
   if (!innerInstructions) {
     return null;
   }
@@ -116,29 +154,46 @@ export async function parseNFTSaleOnTx(
   if (innerInstructions.length < transferInstructionIndex + 1) {
     return null;
   }
-  if (!txResp?.blockTime) {
-    return null;
-  }
-  if (!txResp.meta) {
-    return null;
-  }
 
   const token = getTokenFromMeta(txResp.meta);
   if (!token) {
     return null;
   }
-
   const nftData = await fetchNFTData(web3Conn, token);
   if (!nftData) {
     return null;
   }
-
-  const transfers = getTransfersFromInnerInstructions(
+  let priceInLamport = 0;
+  let transfers = getTransfersFromInnerInstructions(
     innerInstructions[transferInstructionIndex]
   );
   if (!transfers.length) {
+    if (marketplace === solanart) {
+      /**
+       * Solanart bidding purchase transaction doesn't use transfers to distribute royalties
+       * Which is why this method needs a special condition for extracting the price
+       */
+      priceInLamport = getPriceInLamportForSolanaArt(
+        txResp.meta,
+        txResp.transaction.message.accountKeys,
+        buyer
+      );
+    }
+  } else {
+    priceInLamport = transfers.reduce<number>((prev, current) => {
+      return prev + current.revenue.amount;
+    }, 0);
+  }
+  if (!priceInLamport) {
     return null;
   }
+
+  // There are many cases that lamport stored contains floating points
+  // For example: https://explorer.solana.com/tx/5YHfVoe9jSBTa3FWcYV11i6MNtPALTpot1ca6PydLx4nGNyCPc7cghwbz6VXgAyMrxUZDkkp2QoYfot74ckLsUYG
+  // Generally, there should be no reason for the last digit of lamport not to be 0
+  // Rounding it here ensures we get a more accurate result for sale.
+  // That's what the explorers do.
+  priceInLamport = Math.round(priceInLamport / 10) * 10;
 
   return {
     transaction: txResp.transaction.signatures[0],
@@ -149,19 +204,10 @@ export async function parseNFTSaleOnTx(
     nftData,
     soldAt: new Date(txResp.blockTime * 1000),
     getPriceInLamport(): number {
-      return this.transfers.reduce<number>((prev, current) => {
-        return prev + current.revenue.amount;
-      }, 0);
+      return priceInLamport;
     },
     getPriceInSOL() {
-      // There are many cases that lamport stored contains floating points
-      // For example: https://explorer.solana.com/tx/5YHfVoe9jSBTa3FWcYV11i6MNtPALTpot1ca6PydLx4nGNyCPc7cghwbz6VXgAyMrxUZDkkp2QoYfot74ckLsUYG
-      // Generally, there should be no reason for the last digit of lamport not to be 0
-      // Rounding it here ensures we get a more accurate result for sale.
-      // That's what the explorers do.
-      const rounded = Math.round(this.getPriceInLamport() / 10) * 10;
-
-      return rounded / LamportPerSOL;
+      return priceInLamport / LamportPerSOL;
     },
     marketplace,
   };

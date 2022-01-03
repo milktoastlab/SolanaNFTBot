@@ -63,7 +63,7 @@ const port = process.env.PORT || 4000;
         res.send(`No transaction found for ${signature}`);
         return;
       }
-      const nftSale = parseNFTSale(tx);
+      const nftSale = await parseNFTSale(web3Conn, tx);
       if (!nftSale) {
         res.send(
           `No NFT Sale detected for tx: ${signature}\n${JSON.stringify(tx)}`
