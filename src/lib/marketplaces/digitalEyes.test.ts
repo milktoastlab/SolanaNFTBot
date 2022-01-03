@@ -1,7 +1,18 @@
 import digitalEyes from "./digitalEyes";
 import digitalEyesSaleTx from "./__fixtures__/digitalEyesSaleTx";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("digitalEyes", () => {
+  const conn = new Connection("https://test/");
+
   test("itemUrl", () => {
     expect(digitalEyes.itemURL("xxx1")).toEqual(
       "https://digitaleyes.market/item/xxx1"
@@ -9,8 +20,8 @@ describe("digitalEyes", () => {
   });
 
   describe("parseNFTSale", () => {
-    test("sale transaction should return NFTSale", () => {
-      const sale = digitalEyes.parseNFTSale(digitalEyesSaleTx);
+    test("sale transaction should return NFTSale", async () => {
+      const sale = await digitalEyes.parseNFTSale(conn, digitalEyesSaleTx);
       expect(sale.transaction).toEqual(
         "5DqZaNrvEKLLUupRTbt56eYG4f8U25uxYH4wCw5UevbEttkBLDJuF9927yacw7J74kTtWKC1xuyA1QBQRakh3cd1"
       );
@@ -42,7 +53,7 @@ describe("digitalEyes", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
     });
-    test("non-sale transaction should return null", () => {
+    test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {
         ...digitalEyesSaleTx,
         meta: {
@@ -51,14 +62,14 @@ describe("digitalEyes", () => {
           postTokenBalances: [],
         },
       };
-      expect(digitalEyes.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await digitalEyes.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non Solanart transaction", () => {
+    test("non Solanart transaction", async () => {
       const invalidSaleTx = {
         ...digitalEyesSaleTx,
       };
       invalidSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(digitalEyes.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await digitalEyes.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
   });
 });

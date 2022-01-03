@@ -1,4 +1,4 @@
-import { ParsedConfirmedTransaction } from "@solana/web3.js";
+import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import NFTData from "lib/solana/NFTData";
 
 export enum SaleMethod {
@@ -10,7 +10,10 @@ export interface Marketplace {
   name: string;
   programId: string;
   itemURL: (token: String) => string;
-  parseNFTSale: (tx: ParsedConfirmedTransaction) => NFTSale | null;
+  parseNFTSale: (
+    web3Conn: Connection,
+    tx: ParsedConfirmedTransaction
+  ) => Promise<NFTSale | null>;
 }
 
 export interface Transfer {

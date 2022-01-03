@@ -1,4 +1,5 @@
 import {
+  Connection,
   ParsedConfirmedTransaction,
   ParsedConfirmedTransactionMeta,
   ParsedInstruction,
@@ -6,6 +7,7 @@ import {
 } from "@solana/web3.js";
 import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
+import { fetchNFTData } from "../solana/NFTData";
 
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
@@ -42,7 +44,7 @@ function getTokenDestinationFromTx(
     return;
   }
 
-  const destinationBalance = tx.meta?.postTokenBalances.find((balance) => {
+  let destinationBalance = tx.meta?.postTokenBalances.find((balance) => {
     if (!balance.uiTokenAmount.uiAmount) {
       return false;
     }
@@ -67,11 +69,12 @@ function getTokenFromMeta(
   return;
 }
 
-export function parseNFTSaleOnTx(
+export async function parseNFTSaleOnTx(
+  web3Conn: Connection,
   txResp: ParsedConfirmedTransaction,
   marketplace: Marketplace,
   transferInstructionIndex?: number
-): NFTSale | null {
+): Promise<NFTSale | null> {
   if (!txResp.meta?.logMessages) {
     return null;
   }
@@ -125,6 +128,11 @@ export function parseNFTSaleOnTx(
     return null;
   }
 
+  const nftData = await fetchNFTData(web3Conn, token);
+  if (!nftData) {
+    return null;
+  }
+
   const transfers = getTransfersFromInnerInstructions(
     innerInstructions[transferInstructionIndex]
   );
@@ -138,6 +146,7 @@ export function parseNFTSaleOnTx(
     method: buyMethod,
     transfers,
     token,
+    nftData,
     soldAt: new Date(txResp.blockTime * 1000),
     getPriceInLamport(): number {
       return this.transfers.reduce<number>((prev, current) => {

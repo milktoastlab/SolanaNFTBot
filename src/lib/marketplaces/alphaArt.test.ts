@@ -1,14 +1,29 @@
 import alphaArt from "./alphaArt";
 import alphaArtSaleTx from "./__fixtures__/alphaArtSaleTx";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("alphaArt", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const conn = new Connection("https://test/");
+
   test("itemUrl", () => {
     expect(alphaArt.itemURL("xxx1")).toEqual("https://alpha.art/t/xxx1");
   });
 
   describe("parseNFTSale", () => {
-    test("sale transaction should return NFTSale", () => {
-      const sale = alphaArt.parseNFTSale(alphaArtSaleTx);
+    test("sale transaction should return NFTSale", async () => {
+      const sale = await alphaArt.parseNFTSale(conn, alphaArtSaleTx);
       expect(sale.transaction).toEqual(
         "4CwUFDv1JoaK4iN2chARePZZjAPrXdcX2VwDC2Snt4gNgdmFfqtiUR6HkniFNfLwh35rQzTjqhpDkgzWw69e6Svc"
       );
@@ -23,7 +38,7 @@ describe("alphaArt", () => {
         "CScUB4iBTfCWaFkj5gRpXx42HVpAgDvPJgbQxtETRXi1"
       );
     });
-    test("non-sale transaction should return null", () => {
+    test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {
         ...alphaArtSaleTx,
         meta: {
@@ -32,14 +47,14 @@ describe("alphaArt", () => {
           postTokenBalances: [],
         },
       };
-      expect(alphaArt.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await alphaArt.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non Alpha art transaction", () => {
+    test("non Alpha art transaction", async () => {
       const nonAlphaArtSaleTx = {
         ...alphaArtSaleTx,
       };
       nonAlphaArtSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(alphaArt.parseNFTSale(nonAlphaArtSaleTx)).toBe(null);
+      expect(await alphaArt.parseNFTSale(conn, nonAlphaArtSaleTx)).toBe(null);
     });
   });
 });

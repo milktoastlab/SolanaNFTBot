@@ -1,15 +1,27 @@
 import solanart from "./solanart";
 import solanartSaleTx from "./__fixtures__/solanartSaleTx";
 import solanartSaleFromBidTx from "./__fixtures__/solanartSaleFromBidTx";
+import { SaleMethod } from "./types";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("solanart", () => {
+  const conn = new Connection("https://test/");
+
   test("itemUrl", () => {
     expect(solanart.itemURL("xxx1")).toEqual("https://solscan.io/token/xxx1");
   });
 
   describe("parseNFTSale", () => {
-    test("sale transaction should return NFTSale", () => {
-      const sale = solanart.parseNFTSale(solanartSaleTx);
+    test("sale transaction should return NFTSale", async () => {
+      const sale = await solanart.parseNFTSale(conn, solanartSaleTx);
       expect(sale.transaction).toEqual(
         "3qmi5w4ZJsf1PJED21bNVpwgobcMFxUeb6coKJNA32F1fW5WELDXAxnjLzsfnxGnKQfKLuwVBk3xD6zbcjvA9GTX"
       );
@@ -51,16 +63,20 @@ describe("solanart", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
     });
-    test("bidding sale transaction should return NFTSale", () => {
-      const sale = solanart.parseNFTSale(solanartSaleFromBidTx);
+    test("bidding sale transaction should return NFTSale", async () => {
+      const sale = await solanart.parseNFTSale(conn, solanartSaleFromBidTx);
       expect(sale.transaction).toEqual(
         "56QWjtsUykb2cxytM1jwJQmuLjtgZjs7jCZMARYBiCRCy8mEwVXqBFgBhvraDSzA27dUFRxX7Zi5VB4mxvjofXqR"
       );
       expect(sale.token).toEqual(
         "HRGYe4hDNjNVCjmwhmnEiiZtbjzShCwazC1JEyERXRUo"
       );
+      expect(sale.method).toEqual(SaleMethod.Bid);
+      expect(sale.buyer).toEqual(
+        "6bPDVYs5Ewutp8jqurwqfWkL3UeUAGouZg5RJxNY2yAM"
+      );
     });
-    test("non-sale transaction should return null", () => {
+    test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {
         ...solanartSaleTx,
         meta: {
@@ -69,14 +85,14 @@ describe("solanart", () => {
           postTokenBalances: [],
         },
       };
-      expect(solanart.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await solanart.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non Solanart transaction", () => {
+    test("non Solanart transaction", async () => {
       const invalidSaleTx = {
         ...solanartSaleTx,
       };
       invalidSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(solanart.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await solanart.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
   });
 });

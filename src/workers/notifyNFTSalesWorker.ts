@@ -59,7 +59,7 @@ export default function newWorker(
             return;
           }
 
-          const nftSale = parseNFTSale(tx);
+          const nftSale = await parseNFTSale(web3Conn, tx);
           if (!nftSale) {
             return;
           }
@@ -67,13 +67,6 @@ export default function newWorker(
           if (nftSale.buyer === project.mintAddress) {
             return;
           }
-
-          const nftData = await fetchNFTData(web3Conn, nftSale.token);
-          if (!nftData) {
-            return;
-          }
-
-          nftSale.nftData = nftData;
 
           await notifyDiscordSale(discordClient, channel, nftSale);
 

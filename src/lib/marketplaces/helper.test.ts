@@ -13,11 +13,27 @@ import digitalEyes from "./digitalEyes";
 import alphaArt from "./alphaArt";
 import exchangeArt from "./exchangeArt";
 import solsea from "./solsea";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("helper", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const conn = new Connection("https://test/");
+
   describe("parseNFTSaleOnTx", () => {
-    test("getPriceInLamport", () => {
-      const nftSale = parseNFTSaleOnTx(
+    test("getPriceInLamport", async () => {
+      const nftSale = await parseNFTSaleOnTx(
+        conn,
         solanartSalesTxWithFloatingLamport,
         solanart,
         1
@@ -26,8 +42,8 @@ describe("helper", () => {
       expect(nftSale.getPriceInSOL()).toEqual(0.06);
     });
 
-    test("should parse nft sales", () => {
-      const sale = parseNFTSaleOnTx(magicEdenSaleTx, magicEden);
+    test("should parse nft sales", async () => {
+      const sale = await parseNFTSaleOnTx(conn, magicEdenSaleTx, magicEden);
       expect(sale.transaction).toEqual(
         "626EgwuS6dbUKrkZujQCFjHiRsz92ALR5gNAEg2eMpZzEo88Cci6HifpDFcvgYR8j88nXUq1nRUA7UDRdvB7Y6WD"
       );
@@ -106,7 +122,7 @@ describe("helper", () => {
       });
     });
 
-    test("should parse all marketplace purchases", () => {
+    test("should parse all marketplace purchases", async () => {
       const invalidTx = {
         ...magicEdenSaleTx,
         meta: {
@@ -116,7 +132,7 @@ describe("helper", () => {
         },
       };
 
-      [
+      const tests = [
         { tx: magicEdenSaleTx, martketplace: magicEden, shouldParsed: true },
         { tx: invalidTx, martketplace: magicEden, shouldParsed: false },
         { tx: magicEdenSaleTx, martketplace: digitalEyes, shouldParsed: false },
@@ -136,10 +152,16 @@ describe("helper", () => {
           martketplace: exchangeArt,
           shouldParsed: true,
         },
-      ].forEach((testCase) => {
-        const nftSale = parseNFTSaleOnTx(testCase.tx, testCase.martketplace);
+      ].map(async (testCase) => {
+        const nftSale = await parseNFTSaleOnTx(
+          conn,
+          testCase.tx,
+          testCase.martketplace
+        );
         expect(Boolean(nftSale)).toEqual(testCase.shouldParsed);
       });
+
+      return Promise.all(tests);
     });
   });
 });

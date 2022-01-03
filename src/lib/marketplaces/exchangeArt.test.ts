@@ -1,8 +1,23 @@
 import exchangeArt from "./exchangeArt";
 import exchangeArtSaleTx from "./__fixtures__/exchangeArtSaleTx";
 import exchangeArtSaleTxV2 from "./__fixtures__/exchangeArtSaleTxV2";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("exchangeArt", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const conn = new Connection("https://test/");
+
   test("itemUrl", () => {
     expect(exchangeArt.itemURL("xxx1")).toEqual(
       "https://exchange.art/single/xxx1"
@@ -10,8 +25,8 @@ describe("exchangeArt", () => {
   });
 
   describe("parseNFTSale", () => {
-    test("sale transaction should return NFTSale", () => {
-      const sale = exchangeArt.parseNFTSale(exchangeArtSaleTx);
+    test("sale transaction should return NFTSale", async () => {
+      const sale = await exchangeArt.parseNFTSale(conn, exchangeArtSaleTx);
       expect(sale.transaction).toEqual(
         "4WniSeFvZHsnZEDueeWhP18dUC9bGwZjoQ19RQq14796GCdb7WVRsTjK8AZCLLhL136p4J96minzfZcKVjY3fNAY"
       );
@@ -56,8 +71,8 @@ describe("exchangeArt", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
     });
-    test("sale transaction v2 should return NFTSale", () => {
-      const sale = exchangeArt.parseNFTSale(exchangeArtSaleTxV2);
+    test("sale transaction v2 should return NFTSale", async () => {
+      const sale = await exchangeArt.parseNFTSale(conn, exchangeArtSaleTxV2);
       expect(sale.marketplace).toEqual(exchangeArt);
       expect(sale.getPriceInLamport()).toEqual(200000000);
       expect(sale.getPriceInSOL()).toEqual(0.2);
@@ -90,7 +105,7 @@ describe("exchangeArt", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
     });
-    test("non-sale transaction should return null", () => {
+    test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {
         ...exchangeArtSaleTx,
         meta: {
@@ -99,14 +114,14 @@ describe("exchangeArt", () => {
           postTokenBalances: [],
         },
       };
-      expect(exchangeArt.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await exchangeArt.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non exchange art transaction", () => {
+    test("non exchange art transaction", async () => {
       const invalidSaleTx = {
         ...exchangeArtSaleTx,
       };
       invalidSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(exchangeArt.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await exchangeArt.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
   });
 });

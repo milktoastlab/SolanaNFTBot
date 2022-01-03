@@ -5,23 +5,36 @@ import solanartSaleTx from "./__fixtures__/solanartSaleTx";
 import digitalEyeSaleTx from "./__fixtures__/digitalEyesSaleTx";
 import exchangeArtSaleTx from "./__fixtures__/exchangeArtSaleTx";
 import solseaSaleTx from "./__fixtures__/solseaSaleTx";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("parseNFTSale", () => {
-  test("sale transaction should return NFTSale", () => {
-    [
+  const conn = new Connection("https://test/");
+
+  test("sale transaction should return NFTSale", async () => {
+    const tests = [
       magicEdenSaleTx,
       digitalEyeSaleTx,
       solanartSaleTx,
       alphaArtSaleTx,
       exchangeArtSaleTx,
       solseaSaleTx,
-    ].forEach((tx) => {
-      const sale = parseNFTSaleForAllMarkets(tx);
+    ].map(async (tx) => {
+      const sale = await parseNFTSaleForAllMarkets(conn, tx);
       expect(sale?.transaction).toEqual(tx.transaction.signatures[0]);
     });
+
+    return Promise.all(tests);
   });
 
-  test("non-sale transaction should return null", () => {
+  test("non-sale transaction should return null", async () => {
     const invalidSaleTx = {
       ...magicEdenSaleTx,
       meta: {
@@ -30,6 +43,6 @@ describe("parseNFTSale", () => {
         postTokenBalances: [],
       },
     };
-    expect(parseNFTSaleForAllMarkets(invalidSaleTx)).toBe(null);
+    expect(await parseNFTSaleForAllMarkets(conn, invalidSaleTx)).toBe(null);
   });
 });
