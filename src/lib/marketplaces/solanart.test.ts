@@ -1,8 +1,11 @@
 import solanart from "./solanart";
 import solanartSaleTx from "./__fixtures__/solanartSaleTx";
 import solanartSaleFromBidTx from "./__fixtures__/solanartSaleFromBidTx";
+import solanartListingTx from "./__fixtures__/solanartListingTx";
 import { SaleMethod } from "./types";
 import { Connection } from "@solana/web3.js";
+import solanartBidTx from "./__fixtures__/solanartBidTx";
+import solanartDelistingTx from "./__fixtures__/solanartDelistingTx";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -89,6 +92,15 @@ describe("solanart", () => {
         },
       };
       expect(await solanart.parseNFTSale(conn, invalidSaleTx)).toBe(null);
+    });
+    test("listing transaction should return null", async () => {
+      expect(await solanart.parseNFTSale(conn, solanartListingTx)).toBe(null);
+    });
+    test("bid transaction should return null", async () => {
+      expect(await solanart.parseNFTSale(conn, solanartBidTx)).toBe(null);
+    });
+    test("delist transaction should return null", async () => {
+      expect(await solanart.parseNFTSale(conn, solanartDelistingTx)).toBe(null);
     });
     test("non Solanart transaction", async () => {
       const invalidSaleTx = {

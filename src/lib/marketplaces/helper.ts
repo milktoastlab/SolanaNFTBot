@@ -39,6 +39,50 @@ export function getTransfersFromInnerInstructions(
     });
 }
 
+function txContainsLog(tx: ParsedConfirmedTransaction, value: string): boolean {
+  if (!tx.meta?.logMessages) {
+    return false;
+  }
+  return Boolean(
+    tx.meta.logMessages.find((msg) => {
+      return msg.includes(value);
+    })
+  );
+}
+
+function getTokenOriginFromTx(
+  tx: ParsedConfirmedTransaction
+): string | undefined {
+  if (!tx.meta?.preTokenBalances?.length) {
+    return;
+  }
+
+  let balance = tx.meta?.preTokenBalances.find((balance) => {
+    if (!balance.uiTokenAmount.uiAmount) {
+      return false;
+    }
+    return balance.uiTokenAmount.uiAmount > 0;
+  });
+  if (balance) {
+    return (balance as TokenBalance & { owner?: string }).owner;
+  }
+
+  return;
+}
+
+function wasTokenMovedInTx(tx: ParsedConfirmedTransaction): boolean {
+  if (!tx.meta?.postTokenBalances?.length) {
+    return false;
+  }
+  const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
+    if (!balance.uiTokenAmount.uiAmount) {
+      return false;
+    }
+    return balance.uiTokenAmount.uiAmount > 0;
+  });
+  return Boolean(balanceWithToken);
+}
+
 function getTokenDestinationFromTx(
   tx: ParsedConfirmedTransaction
 ): string | undefined {
@@ -105,19 +149,34 @@ export async function parseNFTSaleOnTx(
   marketplace: Marketplace,
   transferInstructionIndex?: number
 ): Promise<NFTSale | null> {
-  if (!txResp.meta?.logMessages) {
+  if (!txResp?.blockTime) {
     return null;
   }
+  if (!txResp.meta) {
+    return null;
+  }
+
   const signer = txResp.transaction.message.accountKeys.find((k) => {
     return k.signer;
   });
   if (!signer) {
     return null;
   }
+  const signerAddress = signer.pubkey.toString();
+
+  // A sale transaction should move the token from one account to another
+  if (!wasTokenMovedInTx(txResp)) {
+    return null;
+  }
+
+  // The token original holder shouldn't be the same as the signer in a sale
+  if (signerAddress === getTokenOriginFromTx(txResp)) {
+    return null;
+  }
 
   // Setting the signer as the default buyer and direct purchases as the default fallback
   // It's true in most cases
-  let buyer = signer.pubkey.toString();
+  let buyer = signerAddress;
   let buyMethod = SaleMethod.Direct;
 
   const tokenDestination = getTokenDestinationFromTx(txResp);
@@ -126,17 +185,11 @@ export async function parseNFTSaleOnTx(
     buyMethod = SaleMethod.Bid;
   }
 
-  const transactionExecByMarketplaceProgram = txResp.meta.logMessages.filter(
-    (msg) => msg.includes(marketplace.programId)
-  ).length;
-
+  const transactionExecByMarketplaceProgram = txContainsLog(
+    txResp,
+    marketplace.programId
+  );
   if (!transactionExecByMarketplaceProgram) {
-    return null;
-  }
-  if (!txResp?.blockTime) {
-    return null;
-  }
-  if (!txResp.meta) {
     return null;
   }
 
@@ -168,7 +221,7 @@ export async function parseNFTSaleOnTx(
     innerInstructions[transferInstructionIndex]
   );
   if (!transfers.length) {
-    if (marketplace === solanart) {
+    if (marketplace === solanart && txContainsLog(txResp, "Accept Offer")) {
       /**
        * Solanart bidding purchase transaction doesn't use transfers to distribute royalties
        * Which is why this method needs a special condition for extracting the price
