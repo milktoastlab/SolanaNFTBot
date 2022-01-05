@@ -1,7 +1,20 @@
 import magicEden from "./magicEden";
 import magicEdenSaleTx from "./__fixtures__/magicEdenSaleTx";
+import magicEdenSaleFromBidTx from "./__fixtures__/magicEdenSaleFromBidTx";
+import { SaleMethod } from "./types";
+import { Connection } from "@solana/web3.js";
+
+jest.mock("lib/solana/NFTData", () => {
+  return {
+    fetchNFTData: () => {
+      return {};
+    },
+  };
+});
 
 describe("magicEden", () => {
+  const conn = new Connection("https://test/");
+
   test("itemUrl", () => {
     expect(magicEden.itemURL("xxx1")).toEqual(
       "https://magiceden.io/item-details/xxx1"
@@ -9,8 +22,8 @@ describe("magicEden", () => {
   });
 
   describe("parseNFTSale", () => {
-    test("sale transaction should return NFTSale", () => {
-      const sale = magicEden.parseNFTSale(magicEdenSaleTx);
+    test("sale transaction should return NFTSale", async () => {
+      const sale = await magicEden.parseNFTSale(conn, magicEdenSaleTx);
       expect(sale.transaction).toEqual(
         "626EgwuS6dbUKrkZujQCFjHiRsz92ALR5gNAEg2eMpZzEo88Cci6HifpDFcvgYR8j88nXUq1nRUA7UDRdvB7Y6WD"
       );
@@ -87,23 +100,38 @@ describe("magicEden", () => {
         expect(transfer.to).toEqual(expectedTransfer.to);
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
+      expect(sale.method).toEqual(SaleMethod.Direct);
     });
-    test("non-sale transaction should return null", () => {
+    test("bidding sale transaction should return NFTSale", async () => {
+      const sale = await magicEden.parseNFTSale(conn, magicEdenSaleFromBidTx);
+      expect(sale.transaction).toEqual(
+        "1cSgCBgot6w4KevVvsZc2PiST16BsEh9KAvmnbsSC9xXvput4SXLoq5pneQfczQEBw3jjcdmupG7Gp6MjG5MLzy"
+      );
+      expect(sale.token).toEqual(
+        "3SxS8hpvZ6BfHXwaURJAhtxXWbwnkUGA7HPV3b7uLnjN"
+      );
+      expect(sale.buyer).toEqual(
+        "2fT7A7iKwDodPj5rm4u4tXRFny9JY1ttHhHGp1PsvsAn"
+      );
+      expect(sale.method).toEqual(SaleMethod.Bid);
+    });
+    test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {
         ...magicEdenSaleTx,
         meta: {
           ...magicEdenSaleTx.meta,
           preTokenBalances: [],
+          postTokenBalances: [],
         },
       };
-      expect(magicEden.parseNFTSale(invalidSaleTx)).toBe(null);
+      expect(await magicEden.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non magic eden transaction", () => {
+    test("non magic eden transaction", async () => {
       const nonMagicEdenSaleTx = {
         ...magicEdenSaleTx,
       };
       nonMagicEdenSaleTx.meta.logMessages = ["Program xxx invoke [1]"];
-      expect(magicEden.parseNFTSale(nonMagicEdenSaleTx)).toBe(null);
+      expect(await magicEden.parseNFTSale(conn, nonMagicEdenSaleTx)).toBe(null);
     });
   });
 });

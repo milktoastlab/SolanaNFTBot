@@ -5,6 +5,7 @@ import { fetchWeb3Transactions } from "lib/solana/connection";
 import { parseNFTSale } from "lib/marketplaces";
 import { fetchNFTData } from "lib/solana/NFTData";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
+import { fetchDiscordChannel } from "../lib/discord";
 
 export interface Project {
   mintAddress: string;
@@ -39,17 +40,14 @@ export default function newWorker(
         return;
       }
 
-      const channel = (await discordClient.channels.fetch(
+      const channel = await fetchDiscordChannel(
+        discordClient,
         project.discordChannelId
-      )) as TextChannel;
+      );
       if (!channel) {
-        console.warn("Can't see channel");
         return;
       }
-      if (!channel.send) {
-        console.warn("Channel must be a TextChannel");
-        return;
-      }
+
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
         until: getSignatureFromTx(latestParsedTx),
@@ -61,7 +59,7 @@ export default function newWorker(
             return;
           }
 
-          const nftSale = parseNFTSale(tx);
+          const nftSale = await parseNFTSale(web3Conn, tx);
           if (!nftSale) {
             return;
           }
@@ -69,13 +67,6 @@ export default function newWorker(
           if (nftSale.buyer === project.mintAddress) {
             return;
           }
-
-          const nftData = await fetchNFTData(web3Conn, nftSale.token);
-          if (!nftData) {
-            return;
-          }
-
-          nftSale.nftData = nftData;
 
           await notifyDiscordSale(discordClient, channel, nftSale);
 

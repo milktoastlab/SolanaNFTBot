@@ -1,12 +1,13 @@
 import { NFTSale } from "./types";
 import marketplaces from "./index";
-import { ParsedConfirmedTransaction } from "@solana/web3.js";
+import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 
-export default function parseNFTSaleForAllMarkets(
+export default async function parseNFTSaleForAllMarkets(
+  web3Conn: Connection,
   tx: ParsedConfirmedTransaction
-): NFTSale | null {
+): Promise<NFTSale | null> {
   for (let i = 0; i < marketplaces.length; i++) {
-    const nftSale = marketplaces[i].parseNFTSale(tx);
+    const nftSale = await marketplaces[i].parseNFTSale(web3Conn, tx);
     if (nftSale) {
       return nftSale;
     }

@@ -1,5 +1,5 @@
 import Discord, { MessageEmbed, TextChannel } from "discord.js";
-import { NFTSale } from "lib/marketplaces";
+import { NFTSale, SaleMethod } from "lib/marketplaces";
 
 const status: {
   totalNotified: number;
@@ -15,16 +15,18 @@ export function getStatus() {
 export default async function notifyDiscordSale(
   client: Discord.Client,
   channel: TextChannel,
-  nftSale: NFTSale
+  nftSale: NFTSale,
+  test?: boolean
 ) {
   if (!client.isReady()) {
     return;
   }
-
   const { marketplace, nftData } = nftSale;
-  const description = `Sold for ${nftSale.getPriceInSOL()} S◎L at ${
-    marketplace.name
-  }`;
+
+  const description = `Sold ${
+    nftSale.method === SaleMethod.Bid ? "via bidding " : ""
+  }for ${nftSale.getPriceInSOL()} S◎L at ${marketplace.name}`;
+
   const embedMsg = new MessageEmbed({
     color: "#0099ff",
     title: nftData?.name,
@@ -40,6 +42,8 @@ export default async function notifyDiscordSale(
   const logMsg = `Notified discord #${channel.name}: ${nftData?.name} - ${description}`;
   console.log(logMsg);
 
-  status.lastNotified = new Date();
-  status.totalNotified++;
+  if (!test) {
+    status.lastNotified = new Date();
+    status.totalNotified++;
+  }
 }

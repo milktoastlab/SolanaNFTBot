@@ -1,10 +1,13 @@
-import { Metadata } from "@metaplex/js";
+import { Creator, Metadata } from "@metaplex/js";
 import axios from "axios";
 import { Connection } from "@solana/web3.js";
 
 export default interface NFTData {
   name: string;
+  symbol: string;
   image: string;
+  sellerFeeBasisPoints: number;
+  creators: Creator[];
 }
 
 export async function fetchNFTData(
