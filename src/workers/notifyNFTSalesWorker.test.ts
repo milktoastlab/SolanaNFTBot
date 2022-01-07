@@ -54,7 +54,7 @@ describe("notifyNFTSalesWorker", () => {
         discordChannelId: "",
       };
 
-      const worker = newWorker(discordClient, conn, project);
+      const worker = newWorker(discordClient, null, conn, project);
 
       await worker.execute();
 
@@ -67,7 +67,7 @@ describe("notifyNFTSalesWorker", () => {
         discordChannelId: "",
       };
 
-      const worker = newWorker(discordClient, conn, project);
+      const worker = newWorker(discordClient, null, conn, project);
 
       await worker.execute();
 

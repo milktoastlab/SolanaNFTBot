@@ -1,4 +1,5 @@
 import Discord, { TextChannel } from "discord.js";
+import TwitterAPI from "twitter-api-v2"
 import { Worker } from "./types";
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
@@ -6,6 +7,7 @@ import { parseNFTSale } from "lib/marketplaces";
 import { fetchNFTData } from "lib/solana/NFTData";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
 import { fetchDiscordChannel } from "../lib/discord";
+import notifyTwitter from "lib/twitter/notifyTwitter";
 
 export interface Project {
   mintAddress: string;
@@ -23,6 +25,7 @@ function getSignatureFromTx(
 
 export default function newWorker(
   discordClient: Discord.Client,
+  twitterClient: TwitterAPI | null,
   web3Conn: Connection,
   project: Project
 ): Worker {
@@ -36,18 +39,10 @@ export default function newWorker(
 
   return {
     async execute() {
-      if (!discordClient.isReady()) {
+      const channel = await getDiscordChannel(discordClient, project.discordChannelId);
+      if (!twitterClient && !channel) {
         return;
       }
-
-      const channel = await fetchDiscordChannel(
-        discordClient,
-        project.discordChannelId
-      );
-      if (!channel) {
-        return;
-      }
-
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
         until: getSignatureFromTx(latestParsedTx),
@@ -67,12 +62,26 @@ export default function newWorker(
           if (nftSale.buyer === project.mintAddress) {
             return;
           }
-
-          await notifyDiscordSale(discordClient, channel, nftSale);
+          if (channel) {
+            await notifyDiscordSale(discordClient, channel, nftSale);
+          }
+          if (twitterClient) {
+            await notifyTwitter(twitterClient, nftSale);
+          }
 
           notifyAfter = nftSale.soldAt;
         },
       });
     },
   };
+}
+
+async function getDiscordChannel(discordClient: Discord.Client, discordChannelId: string) {
+  if (!discordClient.isReady()) {
+    return null;
+  }
+  return fetchDiscordChannel(
+    discordClient,
+    discordChannelId
+  );
 }

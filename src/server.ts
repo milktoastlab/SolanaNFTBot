@@ -12,6 +12,7 @@ import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "./lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
+import initTwitterClient from "lib/twitter";
 
 const port = process.env.PORT || 4000;
 
@@ -25,6 +26,7 @@ const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
     const discordClient = await initDiscordClient();
+    const twitterClient = await initTwitterClient();
 
     const server = express();
     server.get("/", (req, res) => {
@@ -91,7 +93,7 @@ const port = process.env.PORT || 4000;
     });
 
     const workers: Worker[] = config.subscriptions.map((s) => {
-      return notifyNFTSalesWorker(discordClient, web3Conn, {
+      return notifyNFTSalesWorker(discordClient, twitterClient, web3Conn, {
         discordChannelId: s.discordChannelId,
         mintAddress: s.mintAddress,
       });
