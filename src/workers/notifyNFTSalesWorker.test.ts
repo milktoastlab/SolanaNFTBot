@@ -1,7 +1,7 @@
-jest.mock("lib/discord/notifyDiscordSale", () => {
+jest.mock("@/lib/discord/notifyDiscordSale", () => {
   return jest.fn();
 });
-import notifyDiscordSale from "lib/discord/notifyDiscordSale";
+import notifyDiscordSale from "@/lib/discord/notifyDiscordSale";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -11,11 +11,11 @@ jest.mock("lib/solana/NFTData", () => {
   };
 });
 
-import newWorker, { Project } from "./notifyNFTSalesWorker";
-import { newConnection } from "lib/solana";
+import newWorker, { Project } from "@/workers/notifyNFTSalesWorker";
+import { newConnection } from "@/lib/solana";
 import Discord, { TextChannel } from "discord.js";
 import { ConfirmedSignatureInfo, Connection } from "@solana/web3.js";
-import solanartSaleTx from "lib/marketplaces/__fixtures__/solanartSaleTx";
+import solanartSaleTx from "@/lib/marketplaces/__fixtures__/solanartSaleTx";
 
 describe("notifyNFTSalesWorker", () => {
   afterEach(() => {

@@ -39,3 +39,6 @@ yarn-error.log*
 .idea
 
 dist
+
+# globals
+src/globals.ts
