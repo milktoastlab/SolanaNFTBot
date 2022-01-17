@@ -1,5 +1,6 @@
 import Discord, { TextChannel } from "discord.js";
 import TwitterAPI from "twitter-api-v2";
+import queue from "queue";
 import { Worker } from "./types";
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
@@ -8,6 +9,11 @@ import { fetchNFTData } from "lib/solana/NFTData";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
 import { fetchDiscordChannel } from "../lib/discord";
 import notifyTwitter from "lib/twitter/notifyTwitter";
+
+const twitterNotifQueue = queue({
+  concurrency: 1,
+  autostart: true
+});
 
 export interface Project {
   mintAddress: string;
@@ -67,8 +73,9 @@ export default function newWorker(
               .catch(err => catchError(err, "Discord"));
           }
           if (twitterClient) {
-            await notifyTwitter(twitterClient, nftSale)
+            const cb = () => notifyTwitter(twitterClient, nftSale)
             .catch(err => catchError(err, "Twitter"));
+            twitterNotifQueue.push(cb);
           }
 
           notifyAfter = nftSale.soldAt;
