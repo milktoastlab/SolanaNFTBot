@@ -1,11 +1,13 @@
 import TwitterAPI from 'twitter-api-v2';
-import { NFTSale } from "lib/marketplaces";
+import { NFTSale, SaleMethod } from "lib/marketplaces";
 import axios from 'axios';
 import { getFromCache, insertIntoCache } from './mediaIdCache';
 
 export default async function notifyTwitter(twitterClient: TwitterAPI, nftSale: NFTSale) {
     const nftName = nftSale.nftData?.name;
-    const text = `${nftName} has just been sold for ${nftSale.getPriceInSOL()} S◎L at ${nftSale.marketplace.name}! #SolanaNFTs #NFTSale`
+    const text = `${nftName} has just been sold ${
+        nftSale.method === SaleMethod.Bid ? "via bidding " : ""
+    }for ${nftSale.getPriceInSOL()} S◎L at ${nftSale.marketplace.name}! #SolanaNFTs #NFTSale`
     const mediaArr: string[] = [];
     const imgIdFromCache = getFromCache(nftSale.token);
     if (imgIdFromCache) {
