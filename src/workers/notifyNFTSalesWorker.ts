@@ -63,10 +63,12 @@ export default function newWorker(
             return;
           }
           if (channel) {
-            await notifyDiscordSale(discordClient, channel, nftSale);
+            notifyDiscordSale(discordClient, channel, nftSale)
+              .catch(err => catchError(err, "Discord"));
           }
           if (twitterClient) {
-            await notifyTwitter(twitterClient, nftSale);
+            notifyTwitter(twitterClient, nftSale)
+            .catch(err => catchError(err, "Twitter"));
           }
 
           notifyAfter = nftSale.soldAt;
@@ -74,6 +76,10 @@ export default function newWorker(
       });
     },
   };
+}
+
+function catchError(err: Error, platform: string) {
+  console.error(`Error occurred when notifying ${platform}`, err);
 }
 
 async function getDiscordChannel(discordClient: Discord.Client, discordChannelId: string) {
