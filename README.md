@@ -48,6 +48,13 @@ View logs
 docker logs ntfbot
 ```
 
+To make sure the bot is working properly, use [/test-sale-tx](src/server.ts#L47) endpoint
+```
+curl "http://localhost:4000/test-sale-tx?signature={sale_transaction_signature}&channelId={discord_channel_id}"
+```
+
+In case of *DiscordAPIError: Missing Access* error, check if the bot has been invited to the channel. Go to the channel, click "Add members or roles" and add your bot account as a member.
+
 
 Alternatively, you can run it using docker-compose:
 
