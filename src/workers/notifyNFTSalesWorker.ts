@@ -1,5 +1,5 @@
 import Discord, { TextChannel } from "discord.js";
-import TwitterAPI from "twitter-api-v2"
+import TwitterAPI from "twitter-api-v2";
 import { Worker } from "./types";
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
@@ -63,11 +63,11 @@ export default function newWorker(
             return;
           }
           if (channel) {
-            notifyDiscordSale(discordClient, channel, nftSale)
+            await notifyDiscordSale(discordClient, channel, nftSale)
               .catch(err => catchError(err, "Discord"));
           }
           if (twitterClient) {
-            notifyTwitter(twitterClient, nftSale)
+            await notifyTwitter(twitterClient, nftSale)
             .catch(err => catchError(err, "Twitter"));
           }
 
