@@ -1,4 +1,5 @@
 import TwitterAPI from 'twitter-api-v2';
+import { fileTypeFromBuffer } from "file-type";
 import { NFTSale, SaleMethod } from "lib/marketplaces";
 import axios from 'axios';
 import { getFromCache, insertIntoCache } from './mediaIdCache';
@@ -14,7 +15,7 @@ export default async function notifyTwitter(twitterClient: TwitterAPI, nftSale: 
         mediaArr.push(imgIdFromCache);
     } else if (Boolean(nftSale.nftData?.image)) {
         const data = await getImageDataFromUrl(nftSale.nftData?.image as string);
-        const media = await twitterClient.v1.uploadMedia(data, { type: getDataType(data), shared: true });
+        const media = await twitterClient.v1.uploadMedia(data, { type: await getDataType(data), shared: true });
         insertIntoCache(nftSale.token, media);
         mediaArr.push(media);
     }
@@ -23,15 +24,9 @@ export default async function notifyTwitter(twitterClient: TwitterAPI, nftSale: 
     })
 }
 
-function getDataType(buffer: Buffer) {
-    const magic = [
-        ['jpg', 'ffd8ffe0'],
-        ['png', '89504e47'],
-        ['gif', '47494638'],
-    ];
-    const first = buffer.toString("hex", 0, 4)
-    const arr = magic.find(([_, str]) => first === str);
-    return arr && arr[0];
+async function getDataType(buffer: Buffer) {
+    const result = await fileTypeFromBuffer(buffer);
+    return result ? result.ext : undefined;
 }
 
 async function getImageDataFromUrl(url: string) {
