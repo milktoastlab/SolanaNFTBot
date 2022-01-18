@@ -13,8 +13,8 @@
     "build": "tsc",
     "start": "NODE_PATH=./dist/src NODE_ENV=production node dist/src/server.js",
     "test": "jest --no-watchman",
-    "lint-format": "prettier -c ./src/**/*.{ts,tsx}",
-    "fix-format": "prettier -w ./src/**/*.{ts,tsx}"
+    "lint-format": "prettier -c ./src/**/*.ts",
+    "fix-format": "prettier -w ./src/**/*.ts"
   },
   "dependencies": {
     "@discordjs/builders": "^0.8.1",
