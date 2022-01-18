@@ -20,6 +20,7 @@ export default async function notifyTwitter(twitterClient: TwitterAPI, nftSale: 
 }
 
 async function getDataType(buffer: Buffer) {
+    // reason why the import is here: https://github.com/sindresorhus/file-type/issues/525
     const { fromBuffer } = await import("file-type");
     const result = await fromBuffer(buffer);
     return result ? result.ext : undefined;
