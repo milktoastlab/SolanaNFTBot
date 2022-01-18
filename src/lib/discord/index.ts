@@ -1,4 +1,6 @@
-import Discord, { Intents, TextChannel } from "discord.js";
+import Discord, {TextChannel, Intents, MessageEmbed } from "discord.js";
+import {DEFAULTS} from '@/globals';
+
 const myIntents = new Intents();
 myIntents.add(Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES);
 
@@ -17,7 +19,7 @@ export async function initClient(): Promise<Discord.Client> {
       resolve(client);
     });
 
-    client.login(process.env.DISCORD_BOT_TOKEN);
+    client.login(DEFAULTS.DISCORD_BOT_TOKEN);
   });
 }
 

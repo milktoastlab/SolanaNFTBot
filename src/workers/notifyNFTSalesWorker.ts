@@ -1,78 +1,86 @@
-import Discord, { TextChannel } from "discord.js";
-import { Worker } from "./types";
-import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
-import { fetchWeb3Transactions } from "lib/solana/connection";
-import { parseNFTSale } from "lib/marketplaces";
-import { fetchNFTData } from "lib/solana/NFTData";
-import notifyDiscordSale from "lib/discord/notifyDiscordSale";
-import { fetchDiscordChannel } from "../lib/discord";
+import Discord, { MessageEmbed, TextChannel } from "discord.js";
+import {ref } from 'vue';
+import { Worker } from "@/workers/types";
+import {PNFT} from '@/lib/pinata/types';
+import { fetchDiscordChannel } from "@/lib/discord";
+import notifyDiscordSale from "@/lib/discord/notifyDiscordSale"
+import usePinata from "@/lib/pinata/pinata";
 
 export interface Project {
-  mintAddress: string;
-  discordChannelId: string;
+    mintAddress: string;
+    discordChannelId: string;
+  }
+
+export function updateNotifyAfterDate(){
+  /* Calculate a new date
+  */
+  return new Date(Date.now());
+  // return new Date(2021, 10, 31, 0, 0) // NOTE: FIXED DATE FOR TESTING: check 3 tickets are found
 }
 
-function getSignatureFromTx(
-  tx?: ParsedConfirmedTransaction
-): string | undefined {
-  if (tx) {
-    return tx.transaction.signatures[0];
-  }
-  return undefined;
-}
+
 
 export default function newWorker(
-  discordClient: Discord.Client,
-  web3Conn: Connection,
-  project: Project
-): Worker {
-  const timestamp = Date.now();
-  let notifyAfter = new Date(timestamp);
+    discordClient: Discord.Client,
+    project: Project
+  ): Worker {
+    
 
-  /**
-   * This var keeps track of the latest tx so we can optimize the rpc call
-   */
-  let latestParsedTx: ParsedConfirmedTransaction | undefined;
+    let notifyAfter = updateNotifyAfterDate();
 
-  return {
-    async execute() {
-      if (!discordClient.isReady()) {
-        return;
-      }
+    const allPinataTickets = ref<PNFT[]>([]); // this is everything fetched in mem
+    const {retrieveOpenTickets} = usePinata();  
 
-      const channel = await fetchDiscordChannel(
-        discordClient,
-        project.discordChannelId
-      );
-      if (!channel) {
-        return;
-      }
+      return {
+        async execute() {
 
-      await fetchWeb3Transactions(web3Conn, project.mintAddress, {
-        limit: 50,
-        until: getSignatureFromTx(latestParsedTx),
-        async onTransaction(tx) {
-          latestParsedTx = tx;
+          console.log("Worker func called");
+          console.log(`notifyAfter timestamp: ${notifyAfter}`)
 
-          const txCreatedAt = new Date((tx.blockTime || 0) * 1000);
-          if (notifyAfter > txCreatedAt) {
+          // configurable parameters to pass to Pinata API Calls
+          let pinataFilters = {
+            pinStart: notifyAfter.toISOString()
+          };
+
+          retrieveOpenTickets(pinataFilters)
+            .then((pinataTickets) => {
+              if (pinataTickets.length) {
+                  allPinataTickets.value = pinataTickets
+                  console.log("Pinata tickets found has length: ", allPinataTickets.value.length)
+              } else {
+                console.log("No pinata tickets found")
+              }
+            }).catch();
+
+                  
+          if (!discordClient.isReady()) {
+            console.log("client not ready")
+            return;
+          }
+    
+          const channel = await fetchDiscordChannel(
+            discordClient,
+            project.discordChannelId
+          );
+
+          if (!channel) {
+            console.log("no channel exists yet")
+            return;
+          }
+          // Means we don't have new tickets
+          if (allPinataTickets.value.length == 0){
+            notifyAfter = updateNotifyAfterDate();
+            console.log(`No new tickets detected;`);
             return;
           }
 
-          const nftSale = await parseNFTSale(web3Conn, tx);
-          if (!nftSale) {
-            return;
-          }
-          // Don't notify purchases by the project's own account
-          if (nftSale.buyer === project.mintAddress) {
-            return;
-          }
-
-          await notifyDiscordSale(discordClient, channel, nftSale);
-
-          notifyAfter = nftSale.soldAt;
+          console.log(`${allPinataTickets.value.length} New Tickets Found`, )
+          await notifyDiscordSale(discordClient, channel, allPinataTickets.value);
+          notifyAfter = updateNotifyAfterDate();
         },
-      });
-    },
-  };
-}
+
+
+      };
+  }
+
+  

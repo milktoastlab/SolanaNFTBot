@@ -1,49 +1,47 @@
+import { PNFT } from "@/lib/pinata/types";
 import Discord, { MessageEmbed, TextChannel } from "discord.js";
-import { NFTSale, SaleMethod } from "lib/marketplaces";
 
-const status: {
-  totalNotified: number;
-  lastNotified?: Date;
-} = {
-  totalNotified: 0,
-};
+import {readDatePinned, readUserID, readMintID, readTicketName, readTicketStatus, readTicketType, generateTicketDetailLink}  from '@/lib/pinata/pnftInteractions'
 
-export function getStatus() {
-  return status;
+
+export function generateTicketDescription(ticket: PNFT){
+  /* Input: Takes in a ticket (pinata NFT metadata)
+     Output: A description to put in discord channel with relevant info
+  */
+
+     return `This ${readTicketStatus(ticket)} ${readTicketType(ticket)} ticket was asked by user: ${readUserID(ticket)} on ${readDatePinned(ticket)}`
+
 }
 
 export default async function notifyDiscordSale(
-  client: Discord.Client,
-  channel: TextChannel,
-  nftSale: NFTSale,
-  test?: boolean
-) {
-  if (!client.isReady()) {
-    return;
-  }
-  const { marketplace, nftData } = nftSale;
+    client: Discord.Client,
+    channel: TextChannel,
+    newOpenTickets: Array<PNFT>,
+    test?: boolean
+  ) {
 
-  const description = `Sold ${
-    nftSale.method === SaleMethod.Bid ? "via bidding " : ""
-  }for ${nftSale.getPriceInSOL()} S◎L at ${marketplace.name}`;
+   // TODO: replace with full domain once finalized
+   const appUrl = "https://helpdesk-mlg49xt4w-helpdeskxyz.vercel.app/"
+    if (!client.isReady()) {
+        return;
+      }
+      for (let ticket of newOpenTickets){
+        const description = `GM NEED HELP! New Ticket`;
+    
+        const embedMsg = new MessageEmbed({
+          color: "#0099ff",
+          title: readTicketName(ticket),
+          description: generateTicketDescription(ticket),
+          url: generateTicketDetailLink(ticket, appUrl)
+        });
 
-  const embedMsg = new MessageEmbed({
-    color: "#0099ff",
-    title: nftData?.name,
-    description,
-    url: marketplace.itemURL(nftSale.token),
-    thumbnail: {
-      url: nftData?.image,
-    },
-  });
-  await channel.send({
-    embeds: [embedMsg],
-  });
-  const logMsg = `Notified discord #${channel.name}: ${nftData?.name} - ${description}`;
-  console.log(logMsg);
+      
+        await channel.send({
+          embeds: [embedMsg],
+        });
+        const logMsg = `Notified discord #${channel.name}: ${description}`;
+        console.log(logMsg);
+      }
+      
 
-  if (!test) {
-    status.lastNotified = new Date();
-    status.totalNotified++;
-  }
 }

@@ -4,7 +4,7 @@
     "target": "es2019",
     "outDir": "dist",
     "rootDir": "",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -15,10 +15,17 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": false
+    "noEmit": false,
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["**/*.test.ts", "**/node_modules", "**/__fixtures__"],
+  "exclude": ["**/*.test.ts", "**/node_modules", "**/__fixtures__"], // note: Since .test.ts are excluded -> paths in those files don't use '@/*'
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

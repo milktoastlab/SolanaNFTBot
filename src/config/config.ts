@@ -3,6 +3,8 @@ export interface Subscription {
   type: "NFTSale";
   mintAddress: string;
 }
+
+import {DEFAULTS} from '@/globals'
 export interface Config {
   subscriptions: Subscription[];
 }
@@ -23,16 +25,11 @@ export function loadConfig(): MutableConfig {
    * Load config from permanent storage
    */
 
-  if (
-    process.env.SUBSCRIPTION_MINT_ADDRESS &&
-    process.env.SUBSCRIPTION_DISCORD_CHANNEL_ID
-  ) {
-    config.subscriptions.push({
-      type: "NFTSale",
-      discordChannelId: process.env.SUBSCRIPTION_DISCORD_CHANNEL_ID,
-      mintAddress: process.env.SUBSCRIPTION_MINT_ADDRESS,
-    });
-  }
+  config.subscriptions.push({
+    type: "NFTSale",
+    discordChannelId: DEFAULTS.SUBSCRIPTION_DISCORD_CHANNEL_ID,
+    mintAddress: DEFAULTS.AUTHORITY
+  });
 
   return {
     ...config,
