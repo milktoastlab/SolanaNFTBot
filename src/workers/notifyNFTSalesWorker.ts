@@ -69,12 +69,20 @@ export default function newWorker(
             return;
           }
           if (channel) {
-            await notifyDiscordSale(discordClient, channel, nftSale)
-              .catch(err => catchError(err, "Discord"));
+            try {
+              await notifyDiscordSale(discordClient, channel, nftSale)
+            } catch (err) {
+              catchError(err, "Discord")
+            }
           }
           if (twitterClient) {
-            const cb = () => notifyTwitter(twitterClient, nftSale)
-            .catch(err => catchError(err, "Twitter"));
+            const cb = () => {
+              try {
+                return notifyTwitter(twitterClient, nftSale)
+              } catch (err) {
+                catchError(err, "Twitter")
+              }
+            }
             twitterNotifQueue.push(cb);
           }
 
@@ -85,7 +93,7 @@ export default function newWorker(
   };
 }
 
-function catchError(err: Error, platform: string) {
+function catchError(err: unknown, platform: string) {
   console.error(`Error occurred when notifying ${platform}`, err);
 }
 
