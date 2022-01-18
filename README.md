@@ -13,6 +13,7 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 
 ## Features
 - [x] Notify discord channel on each purchase in marketplaces. 
+- [x] Send Twitter tweet on each purchase in marketplaces. (Experimental)
 - [x] [Support major marketplaces](#marketplace-support) 
 
 <img width="508" alt="Screen Shot 2021-11-01 at 7 40 44 pm" src="https://user-images.githubusercontent.com/90617759/139645471-4b2aab1e-2fa2-4691-87ca-1707bc35b027.png">
@@ -104,6 +105,11 @@ DISCORD_BOT_TOKEN=
 SUBSCRIPTION_DISCORD_CHANNEL_ID=
 # Mint address to watch for sales
 SUBSCRIPTION_MINT_ADDRESS=
+# Twitter secrets
+TWITTER_API_KEY=
+TWITTER_API_KEY_SECRET=
+TWITTER_ACCESS_TOKEN=
+TWITTER_ACCESS_TOKEN_SECRET=
 ```
 https://github.com/milktoastlab/SolanaNFTBot/blob/main/.env
 
@@ -135,6 +141,24 @@ It needs to be one of the creator addresses:
 
 _Note: Avoid personal addresses because it could detect unwanted sales._
 
+#### Twitter variables
+
+To post sales notification tweets to Twitter via the API, you will first need Elevated access to the Twitter API.
+
+<img src= https://user-images.githubusercontent.com/50549441/149970878-fc94fb39-8147-4163-a17e-f0552b8e71cc.png>
+
+While logged in to the account you want to use the Twitter API for, apply for Elevated access to the twitter API by clicking the link here and following the steps: 
+https://developer.twitter.com/en/portal/petition/essential/basic-info
+
+The approval process may take a while. 
+
+Create a new project, and create a new App under that project.
+
+The API Key and secret will be displayed to you there, which you'll assign to `TWITTER_API_KEY` and `TWITTER_API_KEY_SECRET` respectively.
+
+Then, click on the Keys and tokens tab, and generate the Access Token and Secret. Assign these to `TWITTER_ACCESS_TOKEN` and `TWITTER_ACCESS_TOKEN_SECRET` respectively.
+
+<img src= https://user-images.githubusercontent.com/50549441/149973388-58f3a303-91f4-4e1b-ab7f-dfc2a22aa5da.png>
 
 ## Marketplace support
 
