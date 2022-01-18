@@ -3,12 +3,9 @@ import FormData from 'form-data';
 import axios from 'axios';
 import { PublicKey } from '@solana/web3.js';
 import { PNFT } from '@/lib/pinata/types';
-
-// todo yes this is INTENTIONALLY LEAKED
-//  this is a burner Pinata acc with 1gb free storage I'm using for storing "I want ur NFTs"
-//  I'm hoping it won't be abused - if it does, just put in your own and run locally or let me know (twitter @_ilmoi)
-const apiKey = '';
-const apiSecret = '';
+import {DEFAULTS} from '@/globals'
+const apiKey = DEFAULTS.PINATA_API_KEY;
+const apiSecret = DEFAULTS.PINATA_API_SECRET;
  
 
 export default function usePinata() {

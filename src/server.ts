@@ -1,6 +1,5 @@
 import { Worker } from "@/workers/types";
 import notifyNFTSalesWorker from '@/workers/notifyNFTSalesWorker';
-import {ref } from 'vue';
 import {
     initClient as initDiscordClient,
   } from '@/lib/discord';

@@ -25,7 +25,7 @@
 
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["**/*.test.ts", "**/node_modules", "**/__fixtures__"],
+  "exclude": ["**/*.test.ts", "**/node_modules", "**/__fixtures__"], // note: Since .test.ts are excluded -> paths in those files don't use '@/*'
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }
