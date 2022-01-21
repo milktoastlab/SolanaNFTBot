@@ -143,6 +143,9 @@ _Note: Avoid personal addresses because it could detect unwanted sales._
 
 #### Twitter variables
 
+*__Disclaimer:__ 
+Twitter notification is still an experimental feature. We haven't stress test it on high volume projects or slow internet connections. Please create an issue if you encounter any problems.* 
+
 To post sales notification tweets to Twitter via the API, you will first need Elevated access to the Twitter API.
 
 <img src= https://user-images.githubusercontent.com/50549441/149970878-fc94fb39-8147-4163-a17e-f0552b8e71cc.png>
