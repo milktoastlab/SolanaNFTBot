@@ -143,8 +143,10 @@ _Note: Avoid personal addresses because it could detect unwanted sales._
 
 #### Twitter variables
 
-*__Disclaimer:__ 
-Twitter notification is still an experimental feature. We haven't stress test it on high volume projects or slow internet connections. Please create an issue if you encounter any problems.* 
+__Experimental:__
+We haven't stress test Twitter notification on high volume projects. We recommend you have a good internet connection for your bot if you want to use this feature, because for each notification, the bot will upload the nft image to Twitter for display. 
+Create a Github issue to let us know if you encounter any problems.
+
 
 To post sales notification tweets to Twitter via the API, you will first need Elevated access to the Twitter API.
 
