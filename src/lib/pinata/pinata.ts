@@ -4,9 +4,17 @@ import axios from 'axios';
 import { PublicKey } from '@solana/web3.js';
 import { PNFT } from '@/lib/pinata/types';
 import {DEFAULTS} from '@/globals'
-const apiKey = DEFAULTS.PINATA_API_KEY;
-const apiSecret = DEFAULTS.PINATA_API_SECRET;
- 
+let apiKey: string = ''
+let apiSecret: string = ''
+
+if (DEFAULTS.PINATA_API_KEY && DEFAULTS.PINATA_API_SECRET){
+  apiKey = DEFAULTS.PINATA_API_KEY;
+  apiSecret = DEFAULTS.PINATA_API_SECRET;
+}
+else{
+  console.log("pinata creds not found in env vars")
+  throw Error
+}
 
 export default function usePinata() {
   const pinata = pinataSDK(apiKey, apiSecret);

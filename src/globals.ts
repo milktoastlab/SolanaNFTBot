@@ -1,37 +1,25 @@
-import events from 'events';
-
-export const EE = new events.EventEmitter.EventEmitter();
-
-// --------------------------------------- errors
-
-export const ERR_NO_NFTS = new Error('No NFTs Found:( Are you on the right network?');
 
 // ---------------------------------------  defaults
 
+// COMMENT OUT FOR HEROKU
+// import dotenv from "dotenv";
+// const result = require('dotenv').config({silent: true});
+// if (result.error) {
+//   throw result.error;
+// }
+
 export const DEFAULTS = {
 
-  // OWNER: '',
-  // CREATOR: '',
-  // MINT: '',
-  // URI: '',
-  // MAX_SUPPLY: null,
-  // MASTER_MINT: '',
-  // UPDATE_AUTHORITY: null,
-  // NFT_MINT: '',
-  // METADATA: null,
-  // PRIMARY_SALE: null,
-  // METADATA_PROGRAM_ID: '',
-
-  AUTHORITY: 'FILL IN',
+  AUTHORITY: process.env.AUTHORITY,
 
   // Discord bot secret
-  DISCORD_BOT_TOKEN: 'FILL IN',
+  DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
   
   // The discord channel to notify
-  SUBSCRIPTION_DISCORD_CHANNEL_ID: 'FILL IN',
+  SUBSCRIPTION_DISCORD_CHANNEL_ID: process.env.SUBSCRIPTION_DISCORD_CHANNEL_ID,
 
-  PINATA_API_KEY: 'FILL IN',
+  PINATA_API_KEY: process.env.PINATA_API_KEY,
 
-  PINATA_API_SECRET: 'FILL IN'
+  PINATA_API_SECRET: process.env.PINATA_API_SECRET
 
 };

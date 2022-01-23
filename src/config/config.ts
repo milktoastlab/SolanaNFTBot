@@ -24,12 +24,17 @@ export function loadConfig(): MutableConfig {
   /**
    * Load config from permanent storage
    */
+   if (
+    DEFAULTS.AUTHORITY &&
+    DEFAULTS.SUBSCRIPTION_DISCORD_CHANNEL_ID
+  ) {
+    config.subscriptions.push({
+      type: "NFTSale",
+      discordChannelId: DEFAULTS.SUBSCRIPTION_DISCORD_CHANNEL_ID,
+      mintAddress: DEFAULTS.AUTHORITY,
+    });
+  }
 
-  config.subscriptions.push({
-    type: "NFTSale",
-    discordChannelId: DEFAULTS.SUBSCRIPTION_DISCORD_CHANNEL_ID,
-    mintAddress: DEFAULTS.AUTHORITY
-  });
 
   return {
     ...config,
