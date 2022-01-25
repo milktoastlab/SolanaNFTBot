@@ -19,16 +19,14 @@ export function updateNotifyAfterDate(){
 }
 
 
-
 export default function newWorker(
     discordClient: Discord.Client,
     project: Project
   ): Worker {
     
-
     let notifyAfter = updateNotifyAfterDate();
 
-    const allPinataTickets = ref<PNFT[]>([]); // this is everything fetched in mem
+    let allPinataTickets = ref<PNFT[]>([]); // this is everything fetched in mem
     const {retrieveOpenTickets} = usePinata();  
 
       return {
@@ -48,6 +46,7 @@ export default function newWorker(
                   allPinataTickets.value = pinataTickets
                   console.log("Pinata tickets found has length: ", allPinataTickets.value.length)
               } else {
+                allPinataTickets.value = pinataTickets
                 console.log("No pinata tickets found")
               }
             }).catch();
