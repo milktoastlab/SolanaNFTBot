@@ -12,7 +12,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
 
 const twitterNotifQueue = queue({
   concurrency: 1,
-  autostart: true,
+  autostart: true
 });
 
 export interface Project {
@@ -45,10 +45,7 @@ export default function newWorker(
 
   return {
     async execute() {
-      const channel = await getDiscordChannel(
-        discordClient,
-        project.discordChannelId
-      );
+      const channel = await getDiscordChannel(discordClient, project.discordChannelId);
       if (!twitterClient && !channel) {
         return;
       }
@@ -72,20 +69,12 @@ export default function newWorker(
             return;
           }
           if (channel) {
-            try {
-              await notifyDiscordSale(discordClient, channel, nftSale);
-            } catch (err) {
-              catchError(err, "Discord");
-            }
+            await notifyDiscordSale(discordClient, channel, nftSale)
+              .catch(err => catchError(err, "Discord"));
           }
           if (twitterClient) {
-            const cb = () => {
-              try {
-                return notifyTwitter(twitterClient, nftSale);
-              } catch (err) {
-                catchError(err, "Twitter");
-              }
-            };
+            const cb = () => notifyTwitter(twitterClient, nftSale)
+            .catch(err => catchError(err, "Twitter"));
             twitterNotifQueue.push(cb);
           }
 
@@ -96,16 +85,16 @@ export default function newWorker(
   };
 }
 
-function catchError(err: unknown, platform: string) {
+function catchError(err: Error, platform: string) {
   console.error(`Error occurred when notifying ${platform}`, err);
 }
 
-async function getDiscordChannel(
-  discordClient: Discord.Client,
-  discordChannelId: string
-) {
+async function getDiscordChannel(discordClient: Discord.Client, discordChannelId: string) {
   if (!discordClient.isReady()) {
     return null;
   }
-  return fetchDiscordChannel(discordClient, discordChannelId);
+  return fetchDiscordChannel(
+    discordClient,
+    discordChannelId
+  );
 }
