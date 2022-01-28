@@ -3,6 +3,7 @@ import { parseNFTSaleOnTx } from "./helper";
 
 const magicEden: Marketplace = {
   name: "Magic Eden",
+  iconUrl: "https://www.magiceden.io/img/favicon.png",
   programId: [
     "MEisE1HzehtrDpAAT8PnLHjpSSkRYakotTuJRPjTpo8",
     "M2mx93ekt1fmXSVkTrUL9xVFHkmME8HTUi5Cyc5aF7K",
