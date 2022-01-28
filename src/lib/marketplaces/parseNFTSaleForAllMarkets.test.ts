@@ -1,4 +1,5 @@
 import magicEdenSaleTx from "./__fixtures__/magicEdenSaleTx";
+import magicEdenSaleTxV2 from "./__fixtures__/magicEdenSaleTxV2";
 import parseNFTSaleForAllMarkets from "./parseNFTSaleForAllMarkets";
 import alphaArtSaleTx from "./__fixtures__/alphaArtSaleTx";
 import solanartSaleTx from "./__fixtures__/solanartSaleTx";
@@ -26,6 +27,7 @@ describe("parseNFTSale", () => {
       alphaArtSaleTx,
       exchangeArtSaleTx,
       solseaSaleTx,
+      magicEdenSaleTxV2,
     ].map(async (tx) => {
       const sale = await parseNFTSaleForAllMarkets(conn, tx);
       expect(sale?.transaction).toEqual(tx.transaction.signatures[0]);
