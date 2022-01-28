@@ -13,6 +13,7 @@ import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "./lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import initTwitterClient from "lib/twitter";
+import notifyTwitter from "lib/twitter/notifyTwitter";
 
 const port = process.env.PORT || 4000;
 
@@ -82,6 +83,15 @@ const port = process.env.PORT || 4000;
         }
       }
 
+      if (req.query['tweet']) {
+        if (twitterClient) {
+          console.log('tweet with twitter client');
+          await notifyTwitter(twitterClient, nftSale)
+          .catch(err => catchError(err, "Twitter"));
+        }
+      }
+
+
       res.send(`NFT Sales parsed: \n${JSON.stringify(nftSale)}`);
     });
 
@@ -98,6 +108,10 @@ const port = process.env.PORT || 4000;
         mintAddress: s.mintAddress,
       });
     });
+
+    function catchError(err: Error, platform: string) {
+      console.error(`Error occurred when notifying ${platform}`, err);
+    }
 
     initWorkers(workers);
   } catch (e) {
