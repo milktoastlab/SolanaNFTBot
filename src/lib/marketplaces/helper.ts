@@ -39,13 +39,16 @@ export function getTransfersFromInnerInstructions(
     });
 }
 
-function txContainsLog(tx: ParsedConfirmedTransaction, value: string): boolean {
+function txContainsLog(
+  tx: ParsedConfirmedTransaction,
+  values: string[]
+): boolean {
   if (!tx.meta?.logMessages) {
     return false;
   }
   return Boolean(
     tx.meta.logMessages.find((msg) => {
-      return msg.includes(value);
+      return Boolean(values.find((value) => msg.includes(value)));
     })
   );
 }
@@ -221,7 +224,7 @@ export async function parseNFTSaleOnTx(
     innerInstructions[transferInstructionIndex]
   );
   if (!transfers.length) {
-    if (marketplace === solanart && txContainsLog(txResp, "Accept Offer")) {
+    if (marketplace === solanart && txContainsLog(txResp, ["Accept Offer"])) {
       /**
        * Solanart bidding purchase transaction doesn't use transfers to distribute royalties
        * Which is why this method needs a special condition for extracting the price
