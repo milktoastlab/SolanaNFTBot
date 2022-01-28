@@ -21,7 +21,8 @@ export default async function notifyDiscordSale(
   ) {
 
    // TODO: replace with full domain once finalized
-   const appUrl = "https://helpdesk-mlg49xt4w-helpdeskxyz.vercel.app/"
+   const appUrl = "https://gmnh.vercel.app/"
+  
     if (!client.isReady()) {
         return;
       }
@@ -32,7 +33,7 @@ export default async function notifyDiscordSale(
           color: "#0099ff",
           title: readTicketName(ticket),
           description: generateTicketDescription(ticket),
-          url: generateTicketDetailLink(ticket, appUrl)
+          url: appUrl
         });
 
       
