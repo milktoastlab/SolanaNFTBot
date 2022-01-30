@@ -101,6 +101,9 @@ describe("magicEden", () => {
         expect(transfer.revenue).toEqual(expectedTransfer.revenue);
       });
       expect(sale.method).toEqual(SaleMethod.Direct);
+      expect(sale.seller).toEqual(
+        "HihC794BdNCetkizxdFjVD2KiKWirGYbm2ojvRYXQd6H"
+      );
     });
     test("bidding sale transaction should return NFTSale", async () => {
       const sale = await magicEden.parseNFTSale(conn, magicEdenSaleFromBidTx);
@@ -114,6 +117,9 @@ describe("magicEden", () => {
         "2fT7A7iKwDodPj5rm4u4tXRFny9JY1ttHhHGp1PsvsAn"
       );
       expect(sale.method).toEqual(SaleMethod.Bid);
+      expect(sale.seller).toEqual(
+        "AJ3r8njrEnHnwmv2JmnXEYoy7EfsxWQq7UcnLUhjuVab"
+      );
     });
     test("non-sale transaction should return null", async () => {
       const invalidSaleTx = {

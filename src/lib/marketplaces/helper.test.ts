@@ -54,6 +54,9 @@ describe("helper", () => {
       expect(sale.marketplace).toEqual(magicEden);
       expect(sale.getPriceInLamport()).toEqual(3720000000);
       expect(sale.getPriceInSOL()).toEqual(3.72);
+      expect(sale.seller).toEqual(
+        "HihC794BdNCetkizxdFjVD2KiKWirGYbm2ojvRYXQd6H"
+      );
 
       const expectedTransfers = [
         {
