@@ -146,6 +146,26 @@ function getPriceInLamportForSolanaArt(
   return transferValues.highestTransfer - transferValues.buyerTransfer;
 }
 
+/**
+ * Guessing the seller from transfers by assuming the seller always get the biggest
+ * cut of the revenue from the sale
+ */
+function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
+  if (!transfers.length) {
+    return;
+  }
+  const saleTransfers = [...transfers];
+  return saleTransfers.sort((t1, t2) => {
+    if (t1.revenue.amount > t2.revenue.amount) {
+      return -1;
+    }
+    if (t1.revenue.amount < t2.revenue.amount) {
+      return 1;
+    }
+    return 0;
+  })[0].to;
+}
+
 export async function parseNFTSaleOnTx(
   web3Conn: Connection,
   txResp: ParsedConfirmedTransaction,
@@ -244,6 +264,8 @@ export async function parseNFTSaleOnTx(
     return null;
   }
 
+  const seller = guessSellerByTransfers(transfers);
+
   // There are many cases that lamport stored contains floating points
   // For example: https://explorer.solana.com/tx/5YHfVoe9jSBTa3FWcYV11i6MNtPALTpot1ca6PydLx4nGNyCPc7cghwbz6VXgAyMrxUZDkkp2QoYfot74ckLsUYG
   // Generally, there should be no reason for the last digit of lamport not to be 0
@@ -254,6 +276,7 @@ export async function parseNFTSaleOnTx(
   return {
     transaction: txResp.transaction.signatures[0],
     buyer,
+    seller,
     method: buyMethod,
     transfers,
     token,
