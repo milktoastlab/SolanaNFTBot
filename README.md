@@ -16,7 +16,7 @@ If you find this project useful, please support us by give Milktoast a shoutout 
 - [x] Send Twitter tweet on each purchase in marketplaces. (Experimental)
 - [x] [Support major marketplaces](#marketplace-support) 
 
-<img width="508" alt="Screen Shot 2021-11-01 at 7 40 44 pm" src="https://user-images.githubusercontent.com/90617759/139645471-4b2aab1e-2fa2-4691-87ca-1707bc35b027.png">
+<img width="400" alt="Screen Shot 2022-01-30 at 10 34 53 pm" src="https://user-images.githubusercontent.com/90617759/151699155-3cb01555-da85-47dd-ad10-2a9dd97eb360.png">
 
 ## Running using docker
 
