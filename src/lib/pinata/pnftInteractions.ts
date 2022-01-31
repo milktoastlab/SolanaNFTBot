@@ -5,7 +5,7 @@ export function generateTicketDetailLink(ticket: PNFT, appUrl?: string)  {
        Output: link to ticket detail page using mintID or undefined (some tickets may not have mintID)
     */
        const appUrlPrefix =  typeof appUrl != undefined ? appUrl : ""
-       const ticketPageEndpoint = "/ticketdetail/"
+       const ticketPageEndpoint = "/question/"
        const attr_key = "mintId"
        let attr = ticket.metadata.keyvalues.hasOwnProperty(attr_key) ? ticket.metadata.keyvalues[attr_key] : undefined
        return typeof attr != 'undefined' ? appUrlPrefix + ticketPageEndpoint + attr : undefined
