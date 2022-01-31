@@ -33,7 +33,7 @@ export default async function notifyDiscordSale(
           color: "#0099ff",
           title: readTicketName(ticket),
           description: generateTicketDescription(ticket),
-          url: appUrl
+          url: generateTicketDetailLink(ticket, appUrl)
         });
 
       
