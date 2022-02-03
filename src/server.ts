@@ -13,6 +13,7 @@ import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "./lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import initTwitterClient from "lib/twitter";
+import notifyTwitter from "lib/twitter/notifyTwitter";
 
 const port = process.env.PORT || 4000;
 
@@ -80,6 +81,13 @@ const port = process.env.PORT || 4000;
         if (channel) {
           await notifyDiscordSale(discordClient, channel, nftSale);
         }
+      }
+
+      const sendTweet = (req.query["tweet"] as string) || "";
+      if (sendTweet && twitterClient) {
+        await notifyTwitter(twitterClient, nftSale).catch((err) => {
+          console.error("Error occurred when notifying twitter", err);
+        });
       }
 
       res.send(`NFT Sales parsed: \n${JSON.stringify(nftSale)}`);
