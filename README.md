@@ -165,6 +165,16 @@ Then, click on the Keys and tokens tab, and generate the Access Token and Secret
 
 <img src= https://user-images.githubusercontent.com/50549441/149973388-58f3a303-91f4-4e1b-ab7f-dfc2a22aa5da.png>
 
+## Production deployment
+
+The solana nft bot is containerized, you can deploy it on any hosting service that supports docker. 
+
+Here are some options: 
+
+* [Akash Network](https://akash.network), a decentralized cloud compute marketplace. [Click here for the step by step guide.](https://medium.com/@kryptoj/how-to-host-a-solana-nft-bot-on-the-akash-network-no-code-ccbeb9ce35d1)
+* https://www.ibm.com/cloud/code-engine
+* [Digital Ocean](https://www.digitalocean.com/products/droplets)
+
 ## Marketplace support
 
 - [x] [Magic Eden](https://magiceden.io/)
