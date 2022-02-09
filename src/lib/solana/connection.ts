@@ -1,12 +1,17 @@
 import {
   ConfirmedSignaturesForAddress2Options,
   Connection,
+  ConnectionConfig,
   ParsedConfirmedTransaction,
   PublicKey,
 } from "@solana/web3.js";
 
 export function newConnection(): Connection {
-  return new Connection(process.env.SOLANA_RPC || "");
+  const config: ConnectionConfig = {};
+  if (process.env.SOLANA_RPC_KEY_SECRET) {
+    config.httpHeaders = { Authorization: process.env.SOLANA_RPC_KEY_SECRET };
+  }
+  return new Connection(process.env.SOLANA_RPC || "", config);
 }
 
 interface Opt extends ConfirmedSignaturesForAddress2Options {

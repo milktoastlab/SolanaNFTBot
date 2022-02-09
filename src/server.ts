@@ -15,8 +15,6 @@ import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import initTwitterClient from "lib/twitter";
 import notifyTwitter from "lib/twitter/notifyTwitter";
 
-const port = process.env.PORT || 4000;
-
 (async () => {
   try {
     const result = dotenv.config();
@@ -24,6 +22,7 @@ const port = process.env.PORT || 4000;
       throw result.error;
     }
     const config = loadConfig();
+    const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
     const discordClient = await initDiscordClient();
