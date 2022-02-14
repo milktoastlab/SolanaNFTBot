@@ -29,7 +29,8 @@ export async function fetchWeb3Transactions(
       limit: opt?.limit,
       before: opt?.before,
       until: opt?.until,
-    }
+    },
+    'finalized'
   );
 
   if (signatures) {
