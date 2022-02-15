@@ -71,6 +71,7 @@ export default function newWorker(
 
           // Don't notify if transaction was previously notified.
           if (latestNotification?.transaction === nftSale.transaction) {
+            logger.warn(`Duplicate tx ignored: ${nftSale.transaction}`);
             return;
           }
 
