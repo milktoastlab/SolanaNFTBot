@@ -4,10 +4,11 @@ import queue from "queue";
 import { Worker } from "./types";
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
-import { parseNFTSale } from "lib/marketplaces";
+import { NFTSale, parseNFTSale } from "lib/marketplaces";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
 import { fetchDiscordChannel } from "lib/discord";
 import notifyTwitter from "lib/twitter/notifyTwitter";
+import logger from "lib/logger";
 
 const twitterNotifyQueue = queue({
   concurrency: 1,
@@ -41,6 +42,7 @@ export default function newWorker(
    * This var keeps track of the latest tx so we can optimize the rpc call
    */
   let latestParsedTx: ParsedConfirmedTransaction | undefined;
+  let latestNotification: NFTSale;
 
   return {
     async execute() {
@@ -66,6 +68,13 @@ export default function newWorker(
           if (!nftSale) {
             return;
           }
+
+          // Don't notify if transaction was previously notified.
+          if (latestNotification?.transaction === nftSale.transaction) {
+            logger.warn(`Duplicate tx ignored: ${nftSale.transaction}`);
+            return;
+          }
+
           // Don't notify purchases by the project's own account
           if (nftSale.buyer === project.mintAddress) {
             return;
@@ -87,7 +96,7 @@ export default function newWorker(
             };
             twitterNotifyQueue.push(cb);
           }
-
+          latestNotification = nftSale;
           notifyAfter = nftSale.soldAt;
         },
       });
@@ -96,7 +105,7 @@ export default function newWorker(
 }
 
 function catchError(err: unknown, platform: string) {
-  console.error(`Error occurred when notifying ${platform}`, err);
+  logger.error(`Error occurred when notifying ${platform}`, err);
 }
 
 async function getDiscordChannel(

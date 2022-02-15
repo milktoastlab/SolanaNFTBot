@@ -1,4 +1,5 @@
 import Discord, { Intents, TextChannel } from "discord.js";
+import logger from "lib/logger";
 const myIntents = new Intents();
 myIntents.add(Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES);
 
@@ -13,7 +14,7 @@ export async function initClient(): Promise<Discord.Client> {
 
   return new Promise((resolve) => {
     client.on("ready", () => {
-      console.log(`Logged in as ${client.user?.tag}!`);
+      logger.log(`Logged in as ${client.user?.tag}!`);
       resolve(client);
     });
 
@@ -27,11 +28,11 @@ export async function fetchDiscordChannel(
 ): Promise<TextChannel | undefined> {
   const channel = (await client.channels.fetch(channelId)) as TextChannel;
   if (!channel) {
-    console.warn("Can't see channel");
+    logger.warn("Can't see channel");
     return;
   }
   if (!channel.send) {
-    console.warn("Channel must be a TextChannel");
+    logger.warn("Channel must be a TextChannel");
     return;
   }
   return channel;

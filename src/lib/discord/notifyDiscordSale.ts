@@ -5,6 +5,7 @@ import Discord, {
 } from "discord.js";
 import { NFTSale, SaleMethod } from "lib/marketplaces";
 import truncateForAddress from "lib/truncateForAddress";
+import logger from "lib/logger";
 
 const status: {
   totalNotified: number;
@@ -29,7 +30,7 @@ export default async function notifyDiscordSale(
   const { marketplace, nftData } = nftSale;
 
   if (!nftData) {
-    console.log("missing nft Data for token: ", nftSale.token);
+    logger.log("missing nft Data for token: ", nftSale.token);
     return;
   }
 
@@ -102,7 +103,7 @@ export default async function notifyDiscordSale(
     embeds: [embedMsg],
   });
   const logMsg = `Notified discord #${channel.name}: ${nftData.name} - ${description}`;
-  console.log(logMsg);
+  logger.log(logMsg);
 
   if (!test) {
     status.lastNotified = new Date();
