@@ -37,6 +37,10 @@ describe("notifyNFTSalesWorker", () => {
             signature: "33CJriD17bUScYW7eKFjM6BPfkFWPerHfdpvtw3a8JdN",
             slot: 1,
           } as ConfirmedSignatureInfo,
+          {
+            signature: "33CJriD17bUScYW7eKFjM6BPfkFWPerHfdpvtw3a8JdN",
+            slot: 1,
+          } as ConfirmedSignatureInfo,
         ];
       });
     jest
@@ -56,6 +60,7 @@ describe("notifyNFTSalesWorker", () => {
 
       const worker = newWorker(discordClient, null, conn, project);
 
+      await worker.execute();
       await worker.execute();
 
       expect(notifyDiscordSale.mock.calls.length).toEqual(1);
