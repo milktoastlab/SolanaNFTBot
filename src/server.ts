@@ -95,9 +95,7 @@ import logger from "lib/logger";
 
     server.listen(port, (err?: any) => {
       if (err) throw err;
-      logger.log(
-        `> Ready on http://localhost:${port} - env ${process.env.NODE_ENV}`
-      );
+      logger.log(`Ready on http://localhost:${port}`);
     });
 
     const workers: Worker[] = config.subscriptions.map((s) => {
