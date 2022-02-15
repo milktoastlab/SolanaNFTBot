@@ -8,6 +8,7 @@ import { NFTSale, parseNFTSale } from "lib/marketplaces";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
 import { fetchDiscordChannel } from "lib/discord";
 import notifyTwitter from "lib/twitter/notifyTwitter";
+import logger from "lib/logger";
 
 const twitterNotifyQueue = queue({
   concurrency: 1,
@@ -103,7 +104,7 @@ export default function newWorker(
 }
 
 function catchError(err: unknown, platform: string) {
-  console.error(`Error occurred when notifying ${platform}`, err);
+  logger.error(`Error occurred when notifying ${platform}`, err);
 }
 
 async function getDiscordChannel(

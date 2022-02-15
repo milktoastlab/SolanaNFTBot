@@ -1,6 +1,7 @@
 import { Creator, Metadata } from "@metaplex/js";
 import axios from "axios";
 import { Connection } from "@solana/web3.js";
+import logger from "lib/logger";
 
 export default interface NFTData {
   name: string;
@@ -21,6 +22,6 @@ export async function fetchNFTData(
     );
     return (await axios.get<NFTData>(metadata.data.data.uri)).data;
   } catch (e) {
-    console.error("fetch NFT data failed", e);
+    logger.error("fetch NFT data failed", e);
   }
 }

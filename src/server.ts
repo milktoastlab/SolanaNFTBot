@@ -14,6 +14,7 @@ import { parseNFTSale } from "./lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import initTwitterClient from "lib/twitter";
 import notifyTwitter from "lib/twitter/notifyTwitter";
+import logger from "lib/logger";
 
 (async () => {
   try {
@@ -57,7 +58,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
       try {
         tx = await web3Conn.getParsedConfirmedTransaction(signature);
       } catch (e) {
-        console.log(e);
+        logger.log(e);
         res.send(`Get transaction failed, check logs for error.`);
         return;
       }
@@ -85,7 +86,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
       const sendTweet = (req.query["tweet"] as string) || "";
       if (sendTweet && twitterClient) {
         await notifyTwitter(twitterClient, nftSale).catch((err) => {
-          console.error("Error occurred when notifying twitter", err);
+          logger.error("Error occurred when notifying twitter", err);
         });
       }
 
@@ -94,7 +95,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
 
     server.listen(port, (err?: any) => {
       if (err) throw err;
-      console.log(
+      logger.log(
         `> Ready on http://localhost:${port} - env ${process.env.NODE_ENV}`
       );
     });
@@ -108,7 +109,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
 
     initWorkers(workers);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     process.exit(1);
   }
 })();
