@@ -20,6 +20,8 @@ export const DEFAULTS = {
 
   PINATA_API_KEY: process.env.PINATA_API_KEY,
 
-  PINATA_API_SECRET: process.env.PINATA_API_SECRET
+  PINATA_API_SECRET: process.env.PINATA_API_SECRET,
+
+  APP_URL: process.env.VUE_APP_APP_URL ? process.env.VUE_APP_APP_URL:"https://gmnh.vercel.app/"
 
 };
