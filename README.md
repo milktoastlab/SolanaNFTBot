@@ -8,7 +8,7 @@ An NFT project that aims to spread happiness and cheer.
 
 <img src="https://user-images.githubusercontent.com/90617759/139604005-addc968d-2193-4e7b-9ac9-86622672391b.png" width=100>
 
-If you find this project useful, please support us by give Milktoast a shoutout on [twitter](https://twitter.com/milktoastnft)! 
+If you find this project useful, please support us by following [Milktoast](https://twitter.com/milktoastnft) and [KryptoJ](https://twitter.com/kryptoj_) on Twitter!  
 
 
 ## Features
