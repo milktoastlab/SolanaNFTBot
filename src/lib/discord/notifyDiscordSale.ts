@@ -6,6 +6,7 @@ import Discord, {
 import { NFTSale, SaleMethod } from "lib/marketplaces";
 import truncateForAddress from "lib/truncateForAddress";
 import logger from "lib/logger";
+import { fetchDiscordChannel } from "./index";
 
 const status: {
   totalNotified: number;
@@ -20,13 +21,15 @@ export function getStatus() {
 
 export default async function notifyDiscordSale(
   client: Discord.Client,
-  channel: TextChannel,
+  channelId: string,
   nftSale: NFTSale,
   test?: boolean
 ) {
-  if (!client.isReady()) {
+  const channel = await fetchDiscordChannel(client, channelId);
+  if (!channel) {
     return;
   }
+
   const { marketplace, nftData } = nftSale;
 
   if (!nftData) {
