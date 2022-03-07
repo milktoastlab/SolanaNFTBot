@@ -1,7 +1,4 @@
-jest.mock("lib/discord/notifyDiscordSale", () => {
-  return jest.fn();
-});
-import notifyDiscordSale from "lib/discord/notifyDiscordSale";
+import {NotificationType} from "lib/notifier";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -12,8 +9,6 @@ jest.mock("lib/solana/NFTData", () => {
 });
 
 import newWorker, { Project } from "./notifyNFTSalesWorker";
-import { newConnection } from "lib/solana";
-import Discord, { TextChannel } from "discord.js";
 import { ConfirmedSignatureInfo, Connection } from "@solana/web3.js";
 import solanartSaleTx from "lib/marketplaces/__fixtures__/solanartSaleTx";
 
@@ -22,11 +17,9 @@ describe("notifyNFTSalesWorker", () => {
     jest.clearAllMocks();
   });
   describe("execute", () => {
-    const discordClient = new Discord.Client({ intents: [] });
-    jest.spyOn(discordClient, "isReady").mockImplementation(() => true);
-    jest.spyOn(discordClient.channels, "fetch").mockImplementation(async () => {
-      return { send() {} } as unknown as TextChannel;
-    });
+    const notifier = {
+      notify: jest.fn(),
+    };
 
     const conn = new Connection("https://test/");
     jest
@@ -58,12 +51,15 @@ describe("notifyNFTSalesWorker", () => {
         discordChannelId: "",
       };
 
-      const worker = newWorker(discordClient, null, conn, project);
+      const worker = newWorker(notifier, conn, project);
 
       await worker.execute();
       await worker.execute();
 
-      expect(notifyDiscordSale.mock.calls.length).toEqual(1);
+      expect(notifier.notify.mock.calls.length).toEqual(1);
+      const expectedArgs = notifier.notify.mock.calls[0];
+      expect(expectedArgs[0]).toEqual(NotificationType.Sale);
+      expect(expectedArgs[1].buyer).toEqual('93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P');
     });
 
     test("sale tx signed by the same mint address ", async () => {
@@ -72,11 +68,14 @@ describe("notifyNFTSalesWorker", () => {
         discordChannelId: "",
       };
 
-      const worker = newWorker(discordClient, null, conn, project);
+      const worker = newWorker(notifier, conn, project);
 
       await worker.execute();
 
-      expect(notifyDiscordSale.mock.calls.length).toEqual(1);
+      expect(notifier.notify.mock.calls.length).toEqual(1);
+      const expectedArgs = notifier.notify.mock.calls[0];
+      expect(expectedArgs[0]).toEqual(NotificationType.Sale);
+      expect(expectedArgs[1].buyer).toEqual('93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P');
     });
   });
 });
