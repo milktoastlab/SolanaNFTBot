@@ -1,4 +1,4 @@
-import { MutableConfig } from "lib/../config";
+import {Config} from "config";
 import { initClient as initDiscordClient } from "lib/discord";
 import initTwitterClient from "lib/twitter";
 import notifyDiscordSale from "lib/discord/notifyDiscordSale";
@@ -6,6 +6,7 @@ import notifyTwitter from "lib/twitter/notifyTwitter";
 import { Project } from "workers/notifyNFTSalesWorker";
 import logger from "lib/logger";
 import queue from "queue";
+import Discord from "discord.js";
 
 export enum NotificationType {
   Sale,
@@ -35,13 +36,12 @@ function queueNotification(
   });
 }
 
-export async function newNotifierFactory(config: MutableConfig) {
-  const nQueue = queue({
-    concurrency: 2,
-    autostart: true,
-  });
+export async function newNotifierFactory(config: Config, nQueue: queue) {
+  let discordClient:Discord.Client;
+  if (config.discordBotToken) {
+    discordClient = await initDiscordClient(config.discordBotToken);
+  }
 
-  const discordClient = await initDiscordClient(config.discordBotToken);
   const twitterClient = await initTwitterClient(config.twitter);
 
   return {

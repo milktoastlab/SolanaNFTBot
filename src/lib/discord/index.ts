@@ -7,10 +7,7 @@ let client: Discord.Client;
 
 export async function initClient(
   token: string
-): Promise<Discord.Client | undefined> {
-  if (!token) {
-    return;
-  }
+): Promise<Discord.Client> {
   if (!client) {
     client = new Discord.Client({
       intents: myIntents,

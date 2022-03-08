@@ -10,12 +10,13 @@ import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
 import { loadConfig } from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
-import { parseNFTSale } from "./lib/marketplaces";
+import { parseNFTSale } from "lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
 import notifyTwitter from "lib/twitter/notifyTwitter";
 import logger from "lib/logger";
-import { newNotifierFactory } from "./lib/notifier";
-import initTwitterClient from "./lib/twitter";
+import { newNotifierFactory } from "lib/notifier";
+import initTwitterClient from "lib/twitter";
+import queue from "queue";
 
 (async () => {
   try {
@@ -28,7 +29,12 @@ import initTwitterClient from "./lib/twitter";
 
     const web3Conn = newConnection();
 
-    const notifierFactory = await newNotifierFactory(config);
+    const nQueue = queue({
+      concurrency: 2,
+      autostart: true,
+    });
+
+    const notifierFactory = await newNotifierFactory(config, nQueue);
 
     const server = express();
     server.get("/", (req, res) => {
