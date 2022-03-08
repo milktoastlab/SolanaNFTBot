@@ -178,6 +178,9 @@ export async function parseNFTSaleOnTx(
   if (!txResp.meta) {
     return null;
   }
+  if (txResp.meta.err) {
+    return null;
+  }
 
   const signer = txResp.transaction.message.accountKeys.find((k) => {
     return k.signer;
