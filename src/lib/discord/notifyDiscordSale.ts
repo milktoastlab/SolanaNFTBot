@@ -90,7 +90,7 @@ export default async function notifyDiscordSale(
       },
     ],
     image: {
-      url: `${nftData.image}`,
+      url: encodeURI(nftData.image),
       width: 600,
       height: 600,
     },
