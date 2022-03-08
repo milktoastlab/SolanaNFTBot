@@ -1,4 +1,4 @@
-import {NotificationType} from "lib/notifier";
+import { NotificationType } from "lib/notifier";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -59,7 +59,9 @@ describe("notifyNFTSalesWorker", () => {
       expect(notifier.notify.mock.calls.length).toEqual(1);
       const expectedArgs = notifier.notify.mock.calls[0];
       expect(expectedArgs[0]).toEqual(NotificationType.Sale);
-      expect(expectedArgs[1].buyer).toEqual('93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P');
+      expect(expectedArgs[1].buyer).toEqual(
+        "93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P"
+      );
     });
 
     test("sale tx signed by the same mint address ", async () => {
@@ -75,7 +77,9 @@ describe("notifyNFTSalesWorker", () => {
       expect(notifier.notify.mock.calls.length).toEqual(1);
       const expectedArgs = notifier.notify.mock.calls[0];
       expect(expectedArgs[0]).toEqual(NotificationType.Sale);
-      expect(expectedArgs[1].buyer).toEqual('93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P');
+      expect(expectedArgs[1].buyer).toEqual(
+        "93ccg27u1tHK1FzqoyRtaUVh3kRwbvYNJcz4NbWWSt1P"
+      );
     });
   });
 });
