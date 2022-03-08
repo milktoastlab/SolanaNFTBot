@@ -14,6 +14,7 @@ interface TwitterConfig {
 export interface Config {
   twitter: TwitterConfig;
   discordBotToken: string;
+  queueConcurrency: number;
   subscriptions: Subscription[];
 }
 
@@ -31,6 +32,7 @@ export function loadConfig(): MutableConfig {
       accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET || "",
     },
     discordBotToken: process.env.DISCORD_BOT_TOKEN || "",
+    queueConcurrency: parseInt(process.env.QUEUE_CONCURRENCY || '2', 10),
     subscriptions: [],
   };
 

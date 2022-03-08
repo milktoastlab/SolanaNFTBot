@@ -30,7 +30,7 @@ import queue from "queue";
     const web3Conn = newConnection();
 
     const nQueue = queue({
-      concurrency: 2,
+      concurrency: config.queueConcurrency,
       autostart: true,
     });
 
