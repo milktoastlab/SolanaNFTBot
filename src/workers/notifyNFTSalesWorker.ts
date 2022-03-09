@@ -19,6 +19,22 @@ function getSignatureFromTx(
   return undefined;
 }
 
+function newNotificationsTracker(limit: number = 50) {
+  let notifiedTxs: string[] = [];
+
+  return {
+    alreadyNotified(tx: string) {
+      return notifiedTxs.includes(tx);
+    },
+    trackNotifiedTx(tx: string) {
+      notifiedTxs = [tx, ...notifiedTxs];
+      if (notifiedTxs.length > limit) {
+        notifiedTxs.pop();
+      }
+    },
+  };
+}
+
 export default function newWorker(
   notifier: Notifier,
   web3Conn: Connection,
@@ -31,7 +47,11 @@ export default function newWorker(
    * This var keeps track of the latest tx so we can optimize the rpc call
    */
   let latestParsedTx: ParsedConfirmedTransaction | undefined;
-  let latestNotification: NFTSale;
+
+  /**
+   * Keep track of the latest notifications, so we don't notify them again
+   */
+  const latestNotifications = newNotificationsTracker();
 
   return {
     async execute() {
@@ -52,7 +72,7 @@ export default function newWorker(
           }
 
           // Don't notify if transaction was previously notified.
-          if (latestNotification?.transaction === nftSale.transaction) {
+          if (latestNotifications.alreadyNotified(nftSale.transaction)) {
             logger.warn(`Duplicate tx ignored: ${nftSale.transaction}`);
             return;
           }
@@ -64,7 +84,7 @@ export default function newWorker(
 
           await notifier.notify(NotificationType.Sale, nftSale);
 
-          latestNotification = nftSale;
+          latestNotifications.trackNotifiedTx(nftSale.transaction);
           notifyAfter = nftSale.soldAt;
         },
       });
