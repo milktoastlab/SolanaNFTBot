@@ -1,19 +1,9 @@
-import Discord from "discord.js";
-import TwitterAPI from "twitter-api-v2";
-import queue from "queue";
 import { Worker } from "./types";
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
-import { NFTSale, parseNFTSale } from "lib/marketplaces";
-import notifyDiscordSale from "lib/discord/notifyDiscordSale";
-import { fetchDiscordChannel } from "lib/discord";
-import notifyTwitter from "lib/twitter/notifyTwitter";
+import { parseNFTSale } from "lib/marketplaces";
 import logger from "lib/logger";
-
-const twitterNotifyQueue = queue({
-  concurrency: 1,
-  autostart: true,
-});
+import { NotificationType, Notifier } from "lib/notifier";
 
 export interface Project {
   mintAddress: string;
@@ -29,9 +19,24 @@ function getSignatureFromTx(
   return undefined;
 }
 
+function newNotificationsTracker(limit: number = 50) {
+  let notifiedTxs: string[] = [];
+
+  return {
+    alreadyNotified(tx: string) {
+      return notifiedTxs.includes(tx);
+    },
+    trackNotifiedTx(tx: string) {
+      notifiedTxs = [tx, ...notifiedTxs];
+      if (notifiedTxs.length > limit) {
+        notifiedTxs.pop();
+      }
+    },
+  };
+}
+
 export default function newWorker(
-  discordClient: Discord.Client,
-  twitterClient: TwitterAPI | null,
+  notifier: Notifier,
   web3Conn: Connection,
   project: Project
 ): Worker {
@@ -42,17 +47,14 @@ export default function newWorker(
    * This var keeps track of the latest tx so we can optimize the rpc call
    */
   let latestParsedTx: ParsedConfirmedTransaction | undefined;
-  let latestNotification: NFTSale;
+
+  /**
+   * Keep track of the latest notifications, so we don't notify them again
+   */
+  const latestNotifications = newNotificationsTracker();
 
   return {
     async execute() {
-      const channel = await getDiscordChannel(
-        discordClient,
-        project.discordChannelId
-      );
-      if (!twitterClient && !channel) {
-        return;
-      }
       await fetchWeb3Transactions(web3Conn, project.mintAddress, {
         limit: 50,
         until: getSignatureFromTx(latestParsedTx),
@@ -70,7 +72,7 @@ export default function newWorker(
           }
 
           // Don't notify if transaction was previously notified.
-          if (latestNotification?.transaction === nftSale.transaction) {
+          if (latestNotifications.alreadyNotified(nftSale.transaction)) {
             logger.warn(`Duplicate tx ignored: ${nftSale.transaction}`);
             return;
           }
@@ -79,41 +81,13 @@ export default function newWorker(
           if (nftSale.buyer === project.mintAddress) {
             return;
           }
-          if (channel) {
-            try {
-              await notifyDiscordSale(discordClient, channel, nftSale);
-            } catch (err) {
-              catchError(err, "Discord");
-            }
-          }
-          if (twitterClient) {
-            const cb = () => {
-              try {
-                return notifyTwitter(twitterClient, nftSale);
-              } catch (err) {
-                catchError(err, "Twitter");
-              }
-            };
-            twitterNotifyQueue.push(cb);
-          }
-          latestNotification = nftSale;
+
+          await notifier.notify(NotificationType.Sale, nftSale);
+
+          latestNotifications.trackNotifiedTx(nftSale.transaction);
           notifyAfter = nftSale.soldAt;
         },
       });
     },
   };
-}
-
-function catchError(err: unknown, platform: string) {
-  logger.error(`Error occurred when notifying ${platform}`, err);
-}
-
-async function getDiscordChannel(
-  discordClient: Discord.Client,
-  discordChannelId: string
-) {
-  if (!discordClient.isReady()) {
-    return null;
-  }
-  return fetchDiscordChannel(discordClient, discordChannelId);
 }

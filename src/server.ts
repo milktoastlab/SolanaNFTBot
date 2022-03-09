@@ -10,11 +10,13 @@ import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
 import { loadConfig } from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
-import { parseNFTSale } from "./lib/marketplaces";
+import { parseNFTSale } from "lib/marketplaces";
 import { ParsedConfirmedTransaction } from "@solana/web3.js";
-import initTwitterClient from "lib/twitter";
 import notifyTwitter from "lib/twitter/notifyTwitter";
 import logger from "lib/logger";
+import { newNotifierFactory } from "lib/notifier";
+import initTwitterClient from "lib/twitter";
+import queue from "queue";
 
 (async () => {
   try {
@@ -26,8 +28,13 @@ import logger from "lib/logger";
     const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
-    const discordClient = await initDiscordClient();
-    const twitterClient = await initTwitterClient();
+
+    const nQueue = queue({
+      concurrency: config.queueConcurrency,
+      autostart: true,
+    });
+
+    const notifierFactory = await newNotifierFactory(config, nQueue);
 
     const server = express();
     server.get("/", (req, res) => {
@@ -73,16 +80,15 @@ import logger from "lib/logger";
         );
         return;
       }
-
-      const channelId = (req.query["channelId"] as string) || "";
-
-      if (channelId) {
-        const channel = await fetchDiscordChannel(discordClient, channelId);
-        if (channel) {
-          await notifyDiscordSale(discordClient, channel, nftSale);
+      if (config.discordBotToken) {
+        const discordClient = await initDiscordClient(config.discordBotToken);
+        if (discordClient) {
+          const channelId = (req.query["channelId"] as string) || "";
+          await notifyDiscordSale(discordClient, channelId, nftSale);
         }
       }
 
+      const twitterClient = await initTwitterClient(config.twitter);
       const sendTweet = (req.query["tweet"] as string) || "";
       if (sendTweet && twitterClient) {
         await notifyTwitter(twitterClient, nftSale).catch((err) => {
@@ -99,13 +105,15 @@ import logger from "lib/logger";
     });
 
     const workers: Worker[] = config.subscriptions.map((s) => {
-      return notifyNFTSalesWorker(discordClient, twitterClient, web3Conn, {
+      const project = {
         discordChannelId: s.discordChannelId,
         mintAddress: s.mintAddress,
-      });
+      };
+      const notifier = notifierFactory.create(project);
+      return notifyNFTSalesWorker(notifier, web3Conn, project);
     });
 
-    initWorkers(workers);
+    const _ = initWorkers(workers);
   } catch (e) {
     logger.error(e);
     process.exit(1);

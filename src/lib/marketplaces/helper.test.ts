@@ -14,6 +14,7 @@ import alphaArt from "./alphaArt";
 import exchangeArt from "./exchangeArt";
 import solsea from "./solsea";
 import { Connection } from "@solana/web3.js";
+import magicEdenFailedTx from "./__fixtures__/magicEdenFailedTx";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -145,6 +146,7 @@ describe("helper", () => {
         { tx: solanartSaleTx, martketplace: digitalEyes, shouldParsed: false },
         { tx: alphaArtSaleTx, martketplace: alphaArt, shouldParsed: true },
         { tx: solseaSaleTx, martketplace: solsea, shouldParsed: true },
+        { tx: magicEdenFailedTx, martketplace: magicEden, shouldParsed: false },
         {
           tx: exchangeArtSaleTx,
           martketplace: exchangeArt,

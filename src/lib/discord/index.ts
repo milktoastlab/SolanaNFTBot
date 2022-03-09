@@ -5,20 +5,23 @@ myIntents.add(Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES);
 
 let client: Discord.Client;
 
-export async function initClient(): Promise<Discord.Client> {
+export async function initClient(
+  token: string
+): Promise<Discord.Client> {
   if (!client) {
     client = new Discord.Client({
       intents: myIntents,
     });
   }
-
-  return new Promise((resolve) => {
+  if (client.isReady()) {
+    return client;
+  }
+  return new Promise<Discord.Client>((resolve) => {
     client.on("ready", () => {
       logger.log(`Logged in as ${client.user?.tag}!`);
       resolve(client);
     });
-
-    client.login(process.env.DISCORD_BOT_TOKEN);
+    client.login(token);
   });
 }
 
@@ -26,6 +29,10 @@ export async function fetchDiscordChannel(
   client: Discord.Client,
   channelId: string
 ): Promise<TextChannel | undefined> {
+  if (!client.isReady()) {
+    return;
+  }
+
   const channel = (await client.channels.fetch(channelId)) as TextChannel;
   if (!channel) {
     logger.warn("Can't see channel");
