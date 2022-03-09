@@ -3,7 +3,7 @@ import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
 import { fetchWeb3Transactions } from "lib/solana/connection";
 import { NFTSale, parseNFTSale } from "lib/marketplaces";
 import logger from "lib/logger";
-import { NotificationType, Notifier } from "../lib/notifier";
+import { NotificationType, Notifier } from "lib/notifier";
 
 export interface Project {
   mintAddress: string;
