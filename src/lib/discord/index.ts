@@ -13,13 +13,14 @@ export async function initClient(
       intents: myIntents,
     });
   }
-
-  return new Promise((resolve) => {
+  if (client.isReady()) {
+    return client;
+  }
+  return new Promise<Discord.Client>((resolve) => {
     client.on("ready", () => {
       logger.log(`Logged in as ${client.user?.tag}!`);
       resolve(client);
     });
-
     client.login(token);
   });
 }

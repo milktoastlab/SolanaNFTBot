@@ -80,11 +80,12 @@ import queue from "queue";
         );
         return;
       }
-
-      const discordClient = await initDiscordClient(config.discordBotToken);
-      if (discordClient) {
-        const channelId = (req.query["channelId"] as string) || "";
-        await notifyDiscordSale(discordClient, channelId, nftSale);
+      if (config.discordBotToken) {
+        const discordClient = await initDiscordClient(config.discordBotToken);
+        if (discordClient) {
+          const channelId = (req.query["channelId"] as string) || "";
+          await notifyDiscordSale(discordClient, channelId, nftSale);
+        }
       }
 
       const twitterClient = await initTwitterClient(config.twitter);
