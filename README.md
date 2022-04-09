@@ -183,6 +183,7 @@ Here are some options:
 - [x] [Alpha Art](https://alpha.art/)
 - [x] [Exchange Art](https://exchange.art/)
 - [x] [Solsea](https://solsea.io/)
+- [x] [OpenSea](https://opensea.io/)
 
 ### Adding new marketplace
 
