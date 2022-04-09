@@ -14,13 +14,14 @@
     "start": "NODE_PATH=./dist/src NODE_ENV=production node dist/src/server.js",
     "test": "jest --no-watchman",
     "lint-format": "prettier -c ./src/**/*.ts",
-    "fix-format": "prettier -w ./src/**/*.ts"
+    "fix-format": "prettier -w ./src/**/*.ts",
+    "transaction": "ts-node --project tsconfig.json -r dotenv/config ./src/cli/get-confirmed-transaction.ts"
   },
   "dependencies": {
     "@discordjs/builders": "^0.8.1",
     "axios": "^0.25.0",
     "discord.js": "^13.2.0",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.1",
     "file-type": "16.5.1",
     "queue": "^6.0.2",

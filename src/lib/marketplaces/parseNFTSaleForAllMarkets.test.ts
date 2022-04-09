@@ -7,6 +7,7 @@ import digitalEyeSaleTx from "./__fixtures__/digitalEyesSaleTx";
 import exchangeArtSaleTx from "./__fixtures__/exchangeArtSaleTx";
 import solseaSaleTx from "./__fixtures__/solseaSaleTx";
 import { Connection } from "@solana/web3.js";
+import openSeaSaleTx from "./__fixtures__/openSeaSaleTx";
 
 jest.mock("lib/solana/NFTData", () => {
   return {
@@ -28,6 +29,7 @@ describe("parseNFTSale", () => {
       exchangeArtSaleTx,
       solseaSaleTx,
       magicEdenSaleTxV2,
+      openSeaSaleTx,
     ].map(async (tx) => {
       const sale = await parseNFTSaleForAllMarkets(conn, tx);
       expect(sale?.transaction).toEqual(tx.transaction.signatures[0]);
