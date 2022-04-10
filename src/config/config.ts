@@ -1,5 +1,4 @@
 import logger from "lib/logger";
-import Dict = NodeJS.Dict;
 
 export interface Subscription {
   discordChannelId: string;
@@ -21,13 +20,15 @@ export interface Config {
   subscriptions: Subscription[];
 }
 
+type Env = { [key:string]: string }
+
 export interface MutableConfig extends Config {
   setSubscriptions(subscriptions: Subscription[]): Promise<void>;
 
   addSubscription(subscription: Subscription): Promise<void>;
 }
 
-function loadSubscriptions(env: Dict<string>): Subscription[] {
+function loadSubscriptions(env: Env): Subscription[] {
   if (!env.SUBSCRIPTION_MINT_ADDRESS || !env.SUBSCRIPTION_DISCORD_CHANNEL_ID) {
     return [];
   }
@@ -64,7 +65,7 @@ function loadSubscriptions(env: Dict<string>): Subscription[] {
   return subscriptions;
 }
 
-export function loadConfig(env: Dict<string>): MutableConfig {
+export function loadConfig(env: Env): MutableConfig {
   const config: Config = {
     twitter: {
       appKey: env.TWITTER_API_KEY || "",

@@ -119,7 +119,10 @@ import queue from "queue";
       return notifyNFTSalesWorker(notifier, web3Conn, project);
     });
 
-    const _ = initWorkers(workers);
+    const _ = initWorkers(workers, () => {
+      // Add randomness between worker executions so the requests are not made all at once
+      return Math.random() * 5000; // 0-5s
+    });
   } catch (e) {
     logger.error(e);
     process.exit(1);
