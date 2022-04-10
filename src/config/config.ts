@@ -1,3 +1,6 @@
+import logger from "lib/logger";
+import Dict = NodeJS.Dict;
+
 export interface Subscription {
   discordChannelId: string;
   type: "NFTSale";
@@ -20,36 +23,59 @@ export interface Config {
 
 export interface MutableConfig extends Config {
   setSubscriptions(subscriptions: Subscription[]): Promise<void>;
+
   addSubscription(subscription: Subscription): Promise<void>;
 }
 
-export function loadConfig(): MutableConfig {
+function loadSubscriptions(env: Dict<string>): Subscription[] {
+  if (!env.SUBSCRIPTION_MINT_ADDRESS || !env.SUBSCRIPTION_DISCORD_CHANNEL_ID) {
+    return [];
+  }
+  const addresses = env.SUBSCRIPTION_MINT_ADDRESS.split(",");
+  const discordChannels = env.SUBSCRIPTION_DISCORD_CHANNEL_ID.split(",");
+  if (
+    discordChannels.length != addresses.length &&
+    discordChannels.length !== 1
+  ) {
+    logger.error(
+      `Invalid number of discord channel ids: ${discordChannels.length}`
+    );
+    return [];
+  }
+
+  const subscriptions: Subscription[] = [];
+
+  addresses.forEach((address, idx) => {
+    if (!address) {
+      return;
+    }
+    const channel = discordChannels[idx] || discordChannels[0];
+    if (!channel) {
+      return;
+    }
+
+    subscriptions.push({
+      type: "NFTSale",
+      discordChannelId: channel,
+      mintAddress: address,
+    });
+  });
+
+  return subscriptions;
+}
+
+export function loadConfig(env: Dict<string>): MutableConfig {
   const config: Config = {
     twitter: {
-      appKey: process.env.TWITTER_API_KEY || "",
-      appSecret: process.env.TWITTER_API_KEY_SECRET || "",
-      accessToken: process.env.TWITTER_ACCESS_TOKEN || "",
-      accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET || "",
+      appKey: env.TWITTER_API_KEY || "",
+      appSecret: env.TWITTER_API_KEY_SECRET || "",
+      accessToken: env.TWITTER_ACCESS_TOKEN || "",
+      accessSecret: env.TWITTER_ACCESS_TOKEN_SECRET || "",
     },
-    discordBotToken: process.env.DISCORD_BOT_TOKEN || "",
-    queueConcurrency: parseInt(process.env.QUEUE_CONCURRENCY || "2", 10),
-    subscriptions: [],
+    discordBotToken: env.DISCORD_BOT_TOKEN || "",
+    queueConcurrency: parseInt(env.QUEUE_CONCURRENCY || "2", 10),
+    subscriptions: loadSubscriptions(env),
   };
-
-  /**
-   * Load config from permanent storage
-   */
-
-  if (
-    process.env.SUBSCRIPTION_MINT_ADDRESS &&
-    process.env.SUBSCRIPTION_DISCORD_CHANNEL_ID
-  ) {
-    config.subscriptions.push({
-      type: "NFTSale",
-      discordChannelId: process.env.SUBSCRIPTION_DISCORD_CHANNEL_ID || "",
-      mintAddress: process.env.SUBSCRIPTION_MINT_ADDRESS || "",
-    });
-  }
 
   return {
     ...config,

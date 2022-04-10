@@ -1,6 +1,5 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
-  fetchDiscordChannel,
   initClient as initDiscordClient,
 } from "lib/discord";
 import initWorkers from "workers/initWorkers";
@@ -24,7 +23,9 @@ import queue from "queue";
     if (result.error) {
       throw result.error;
     }
-    const config = loadConfig();
+
+    const config = loadConfig(process.env);
+    const {subscriptions} = config;
     const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
@@ -40,7 +41,7 @@ import queue from "queue";
     server.get("/", (req, res) => {
       const { totalNotified, lastNotified } = getStatus();
       res.send(`
-      ${config.subscriptions.map(
+      ${subscriptions.map(
         (s) =>
           `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
       )}
@@ -104,7 +105,12 @@ import queue from "queue";
       logger.log(`Ready on http://localhost:${port}`);
     });
 
-    const workers: Worker[] = config.subscriptions.map((s) => {
+    if (!subscriptions.length) {
+      logger.warn('No subscriptions loaded');
+      return;
+    }
+
+    const workers: Worker[] = subscriptions.map((s) => {
       const project = {
         discordChannelId: s.discordChannelId,
         mintAddress: s.mintAddress,
