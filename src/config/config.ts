@@ -20,7 +20,7 @@ export interface Config {
   subscriptions: Subscription[];
 }
 
-type Env = { [key:string]: string }
+export type Env = { [key: string]: string };
 
 export interface MutableConfig extends Config {
   setSubscriptions(subscriptions: Subscription[]): Promise<void>;

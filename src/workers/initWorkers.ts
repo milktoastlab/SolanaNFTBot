@@ -7,7 +7,7 @@ const defaultInterval = 1000 * 60; // 1 minutes
 export default async function initWorkers(
   workers: Worker[],
   delayInMs?: () => number,
-  interval: number = defaultInterval,
+  interval: number = defaultInterval
 ) {
   if (!workers.length) {
     throw "Cannot init workers because no workers are configured: check env vars";

@@ -6,7 +6,7 @@ import initWorkers from "workers/initWorkers";
 import { newConnection } from "lib/solana/connection";
 import dotenv from "dotenv";
 import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
-import { loadConfig } from "config";
+import {Env, loadConfig} from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "lib/marketplaces";
@@ -24,7 +24,7 @@ import queue from "queue";
       throw result.error;
     }
 
-    const config = loadConfig(process.env);
+    const config = loadConfig(process.env as Env);
     const {subscriptions} = config;
     const port = process.env.PORT || 4000;
 
