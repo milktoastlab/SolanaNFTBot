@@ -1,13 +1,12 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
-  fetchDiscordChannel,
   initClient as initDiscordClient,
 } from "lib/discord";
 import initWorkers from "workers/initWorkers";
 import { newConnection } from "lib/solana/connection";
 import dotenv from "dotenv";
 import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
-import { loadConfig } from "config";
+import {Env, loadConfig} from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "lib/marketplaces";
@@ -24,7 +23,9 @@ import queue from "queue";
     if (result.error) {
       throw result.error;
     }
-    const config = loadConfig();
+
+    const config = loadConfig(process.env as Env);
+    const {subscriptions} = config;
     const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
@@ -40,7 +41,7 @@ import queue from "queue";
     server.get("/", (req, res) => {
       const { totalNotified, lastNotified } = getStatus();
       res.send(`
-      ${config.subscriptions.map(
+      ${subscriptions.map(
         (s) =>
           `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
       )}
@@ -104,7 +105,12 @@ import queue from "queue";
       logger.log(`Ready on http://localhost:${port}`);
     });
 
-    const workers: Worker[] = config.subscriptions.map((s) => {
+    if (!subscriptions.length) {
+      logger.warn('No subscriptions loaded');
+      return;
+    }
+
+    const workers: Worker[] = subscriptions.map((s) => {
       const project = {
         discordChannelId: s.discordChannelId,
         mintAddress: s.mintAddress,
@@ -113,7 +119,10 @@ import queue from "queue";
       return notifyNFTSalesWorker(notifier, web3Conn, project);
     });
 
-    const _ = initWorkers(workers);
+    const _ = initWorkers(workers, () => {
+      // Add randomness between worker executions so the requests are not made all at once
+      return Math.random() * 5000; // 0-5s
+    });
   } catch (e) {
     logger.error(e);
     process.exit(1);

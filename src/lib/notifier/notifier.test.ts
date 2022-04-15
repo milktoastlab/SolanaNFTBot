@@ -24,7 +24,7 @@ describe("notifier", () => {
 
   it("notify with discord client", async () => {
     const factory = await newNotifierFactory({
-      ...(loadConfig()),
+      ...(loadConfig({})),
       discordBotToken: 'test-token-1',
     }, nQueue);
 
@@ -41,7 +41,7 @@ describe("notifier", () => {
   it("notify with twitter client", async () => {
     jest.unmock('lib/discord');
     const factory = await newNotifierFactory({
-      ...(loadConfig()),
+      ...(loadConfig({})),
       twitter: {
         appKey: 'app-x',
         appSecret: 'app-secret-1',
