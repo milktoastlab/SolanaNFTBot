@@ -1,5 +1,6 @@
 import openSea from "./openSea";
 import openSeaSaleTx from "./__fixtures__/openSeaSaleTx";
+import openSeaBidTx from "./__fixtures__/openSeaBidTx";
 import { Connection } from "@solana/web3.js";
 
 jest.mock("lib/solana/NFTData", () => {
@@ -45,7 +46,10 @@ describe("openSea", () => {
       };
       expect(await openSea.parseNFTSale(conn, invalidSaleTx)).toBe(null);
     });
-    test("non Solsea transaction", async () => {
+    test("bidding transaction should return null", async () => {
+      expect(await openSea.parseNFTSale(conn, openSeaBidTx)).toBe(null);
+    });
+    test("non OpenSea transaction", async () => {
       const invalidSaleTx = {
         ...openSeaSaleTx,
       };

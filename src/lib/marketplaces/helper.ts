@@ -77,12 +77,28 @@ function wasTokenMovedInTx(tx: ParsedConfirmedTransaction): boolean {
   if (!tx.meta?.postTokenBalances?.length) {
     return false;
   }
-  const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
+  if (!tx.meta?.preTokenBalances?.length) {
+    return false;
+  }
+
+  let originalBalance = tx.meta?.preTokenBalances.find((balance) => {
     if (!balance.uiTokenAmount.uiAmount) {
       return false;
     }
     return balance.uiTokenAmount.uiAmount > 0;
   });
+
+  const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
+    if (originalBalance.owner && originalBalance.owner === balance.owner) {
+      return false;
+    }
+
+    if (!balance.uiTokenAmount.uiAmount) {
+      return false;
+    }
+    return balance.uiTokenAmount.uiAmount > 0;
+  });
+
   return Boolean(balanceWithToken);
 }
 
