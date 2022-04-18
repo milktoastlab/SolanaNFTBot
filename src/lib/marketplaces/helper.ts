@@ -2,6 +2,7 @@ import {
   Connection,
   ParsedConfirmedTransaction,
   ParsedConfirmedTransactionMeta,
+  ParsedInnerInstruction,
   ParsedInstruction,
   ParsedMessageAccount,
   TokenBalance,
@@ -77,12 +78,28 @@ function wasTokenMovedInTx(tx: ParsedConfirmedTransaction): boolean {
   if (!tx.meta?.postTokenBalances?.length) {
     return false;
   }
-  const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
+  if (!tx.meta?.preTokenBalances?.length) {
+    return false;
+  }
+
+  let originalBalance = tx.meta?.preTokenBalances.find((balance) => {
     if (!balance.uiTokenAmount.uiAmount) {
       return false;
     }
     return balance.uiTokenAmount.uiAmount > 0;
   });
+
+  const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
+    if (originalBalance?.owner && originalBalance.owner === balance.owner) {
+      return false;
+    }
+
+    if (!balance.uiTokenAmount.uiAmount) {
+      return false;
+    }
+    return balance.uiTokenAmount.uiAmount > 0;
+  });
+
   return Boolean(balanceWithToken);
 }
 
@@ -166,6 +183,18 @@ function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
   })[0].to;
 }
 
+function findLargestInnerInstructionIndex(
+  innerInstructions: ParsedInnerInstruction[]
+) {
+  return innerInstructions.reduce((prevIndex, current, currentIndex) => {
+    const prevInstruction = innerInstructions[prevIndex];
+    if (current.instructions.length > prevInstruction.instructions.length) {
+      return currentIndex;
+    }
+    return prevIndex;
+  }, 0);
+}
+
 export async function parseNFTSaleOnTx(
   web3Conn: Connection,
   txResp: ParsedConfirmedTransaction,
@@ -195,11 +224,6 @@ export async function parseNFTSaleOnTx(
     return null;
   }
 
-  // The token original holder shouldn't be the same as the signer in a sale
-  if (signerAddress === getTokenOriginFromTx(txResp)) {
-    return null;
-  }
-
   // Setting the signer as the default buyer and direct purchases as the default fallback
   // It's true in most cases
   let buyer = signerAddress;
@@ -210,7 +234,6 @@ export async function parseNFTSaleOnTx(
     buyer = tokenDestination;
     buyMethod = SaleMethod.Bid;
   }
-
   const transactionExecByMarketplaceProgram = txContainsLog(
     txResp,
     marketplace.programId
@@ -226,9 +249,9 @@ export async function parseNFTSaleOnTx(
     return null;
   }
 
-  // Use the last index of it's not set
   if (typeof transferInstructionIndex == "undefined") {
-    transferInstructionIndex = innerInstructions.length - 1;
+    transferInstructionIndex =
+      findLargestInnerInstructionIndex(innerInstructions);
   }
   if (innerInstructions.length < transferInstructionIndex + 1) {
     return null;
@@ -258,6 +281,9 @@ export async function parseNFTSaleOnTx(
         buyer
       );
     }
+  } else if (transfers.length === 1) {
+    // There should be more than one transfers as all NFT contains royalties and seller revenue
+    return null;
   } else {
     priceInLamport = transfers.reduce<number>((prev, current) => {
       return prev + current.revenue.amount;
