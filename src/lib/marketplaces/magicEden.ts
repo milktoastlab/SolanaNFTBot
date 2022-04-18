@@ -10,7 +10,7 @@ const magicEden: Marketplace = {
   iconURL: "https://www.magiceden.io/img/favicon.png",
   itemURL: (token: String) => `https://magiceden.io/item-details/${token}`,
   parseNFTSale(web3Conn, txResp): Promise<NFTSale | null> {
-    return parseNFTSaleOnTx(web3Conn, txResp, this, 0);
+    return parseNFTSaleOnTx(web3Conn, txResp, this);
   },
 };
 

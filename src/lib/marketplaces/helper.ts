@@ -89,7 +89,7 @@ function wasTokenMovedInTx(tx: ParsedConfirmedTransaction): boolean {
   });
 
   const balanceWithToken = tx.meta?.postTokenBalances.find((balance) => {
-    if (originalBalance.owner && originalBalance.owner === balance.owner) {
+    if (originalBalance?.owner && originalBalance.owner === balance.owner) {
       return false;
     }
 
@@ -211,11 +211,6 @@ export async function parseNFTSaleOnTx(
     return null;
   }
 
-  // The token original holder shouldn't be the same as the signer in a sale
-  if (signerAddress === getTokenOriginFromTx(txResp)) {
-    return null;
-  }
-
   // Setting the signer as the default buyer and direct purchases as the default fallback
   // It's true in most cases
   let buyer = signerAddress;
@@ -226,7 +221,6 @@ export async function parseNFTSaleOnTx(
     buyer = tokenDestination;
     buyMethod = SaleMethod.Bid;
   }
-
   const transactionExecByMarketplaceProgram = txContainsLog(
     txResp,
     marketplace.programId
@@ -274,6 +268,9 @@ export async function parseNFTSaleOnTx(
         buyer
       );
     }
+  } else if (transfers.length === 1) {
+    // There should be more than one transfers as all NFT contains royalties and seller revenue
+    return null;
   } else {
     priceInLamport = transfers.reduce<number>((prev, current) => {
       return prev + current.revenue.amount;
