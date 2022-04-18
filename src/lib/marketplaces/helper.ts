@@ -2,6 +2,7 @@ import {
   Connection,
   ParsedConfirmedTransaction,
   ParsedConfirmedTransactionMeta,
+  ParsedInnerInstruction,
   ParsedInstruction,
   ParsedMessageAccount,
   TokenBalance,
@@ -182,6 +183,18 @@ function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
   })[0].to;
 }
 
+function findLargestInnerInstructionIndex(
+  innerInstructions: ParsedInnerInstruction[]
+) {
+  return innerInstructions.reduce((prevIndex, current, currentIndex) => {
+    const prevInstruction = innerInstructions[prevIndex];
+    if (current.instructions.length > prevInstruction.instructions.length) {
+      return currentIndex;
+    }
+    return prevIndex;
+  }, 0);
+}
+
 export async function parseNFTSaleOnTx(
   web3Conn: Connection,
   txResp: ParsedConfirmedTransaction,
@@ -236,9 +249,9 @@ export async function parseNFTSaleOnTx(
     return null;
   }
 
-  // Use the last index of it's not set
   if (typeof transferInstructionIndex == "undefined") {
-    transferInstructionIndex = innerInstructions.length - 1;
+    transferInstructionIndex =
+      findLargestInnerInstructionIndex(innerInstructions);
   }
   if (innerInstructions.length < transferInstructionIndex + 1) {
     return null;

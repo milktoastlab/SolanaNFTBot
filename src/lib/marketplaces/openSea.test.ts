@@ -1,6 +1,7 @@
 import openSea from "./openSea";
 import openSeaSaleTx from "./__fixtures__/openSeaSaleTx";
 import openSeaSale2Tx from "./__fixtures__/openSeaSale2Tx";
+import openSeaSale3Tx from "./__fixtures__/openSeaSale3Tx";
 import openSeaBidTx from "./__fixtures__/openSeaBidTx";
 import { Connection } from "@solana/web3.js";
 
@@ -48,6 +49,18 @@ describe("openSea", () => {
       );
       expect(sale.token).toEqual(
         "CiRHyMF2zUdfqJ5x6ixQnDiPJw4CcWWGmdqS2YQiFd88"
+      );
+    });
+    test("sale transaction v3 should return NFTSale", async () => {
+      const sale = await openSea.parseNFTSale(conn, openSeaSale3Tx);
+      if (!sale) {
+        fail("did not return NFTSale");
+      }
+      expect(sale.transaction).toEqual(
+        "66EfiWJrPWzdu4BqFAff1Eov7JQfUrfMbmmxAKEx6QqrS2D6zm5XbsCP5yq3RnaUzUDxc5tWJBChBjmhWNFXzmaR"
+      );
+      expect(sale.token).toEqual(
+        "FfiAdK89m762LxdCQTjdKB4qyH77PMzhgt2wbP5SGg6V"
       );
     });
     test("non-sale transaction should return null", async () => {
