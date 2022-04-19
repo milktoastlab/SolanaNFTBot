@@ -25,7 +25,7 @@ export function getTransfersFromInnerInstructions(
 
   return instructions
     .filter((i: any) => {
-      return Boolean(i.parsed.info.lamports) && i.parsed.type === "transfer";
+      return Boolean(i?.parsed?.info.lamports) && i.parsed.type === "transfer";
     })
     .map<Transfer>((i: any) => {
       const { info } = i.parsed;
