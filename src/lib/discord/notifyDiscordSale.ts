@@ -3,7 +3,7 @@ import Discord, {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
-import { NFTSale, SaleMethod } from "lib/marketplaces";
+import { Marketplace, NFTSale, SaleMethod } from "lib/marketplaces";
 import truncateForAddress from "lib/truncateForAddress";
 import logger from "lib/logger";
 import { fetchDiscordChannel } from "./index";
@@ -80,12 +80,14 @@ export default async function notifyDiscordSale(
       },
       {
         name: "Buyer",
-        value: truncateForAddress(nftSale.buyer),
+        value: formatAddress(marketplace, nftSale.buyer),
         inline: true,
       },
       {
         name: "Seller",
-        value: nftSale.seller ? truncateForAddress(nftSale.seller) : "unknown",
+        value: nftSale.seller
+          ? formatAddress(marketplace, nftSale.seller)
+          : "unknown",
         inline: true,
       },
     ],
@@ -112,4 +114,12 @@ export default async function notifyDiscordSale(
     status.lastNotified = new Date();
     status.totalNotified++;
   }
+}
+
+function formatAddress(marketplace: Marketplace, address: string): string {
+  if (!address) {
+    return "";
+  }
+
+  return `[${truncateForAddress(address)}](${marketplace.profileURL(address)})`;
 }
