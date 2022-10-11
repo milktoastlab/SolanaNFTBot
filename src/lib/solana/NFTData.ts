@@ -7,7 +7,6 @@ export default interface NFTData {
   symbol: string;
   image: string;
   sellerFeeBasisPoints: number;
-  creators: Creator[];
 }
 
 export async function fetchNFTData(
@@ -30,7 +29,6 @@ export async function fetchNFTData(
       symbol: metadata.json.symbol || "",
       image: metadata.json.image || "",
       sellerFeeBasisPoints: metadata.json.seller_fee_basis_points || 0,
-      creators: [],
     };
   } catch (e) {
     logger.error("fetch NFT data failed", e);
