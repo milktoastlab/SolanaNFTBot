@@ -6,6 +6,8 @@ const digitalEyes: Marketplace = {
   programId: ["A7p8451ktDCHq5yYaHczeLMYsjRsAkzc3hCXcSrwYHU7"],
   iconURL: "https://digitaleyes.market/apple-touch-icon.png",
   itemURL: (token: String) => `https://digitaleyes.market/item/${token}`,
+  profileURL: (address: String) =>
+    `https://explorer.solana.com/address/${address}`,
   parseNFTSale(web3Conn, txResp): Promise<NFTSale | null> {
     return parseNFTSaleOnTx(web3Conn, txResp, this, 1);
   },

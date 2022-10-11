@@ -11,6 +11,7 @@ export interface Marketplace {
   programId: string[];
   iconURL: string;
   itemURL: (token: String) => string;
+  profileURL: (address: String) => string;
   parseNFTSale: (
     web3Conn: Connection,
     tx: ParsedConfirmedTransaction

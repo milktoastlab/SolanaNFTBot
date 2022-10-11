@@ -6,6 +6,8 @@ const exchangeArt: Marketplace = {
   programId: ["AmK5g2XcyptVLCFESBCJqoSfwV3znGoVYQnqEnaAZKWn"],
   iconURL: "https://cdn.exchange.art/static/apple-meta-logo.png",
   itemURL: (token: String) => `https://exchange.art/single/${token}`,
+  profileURL: (address: String) =>
+    `https://explorer.solana.com/address/${address}`,
   parseNFTSale(web3Conn, txResp): Promise<NFTSale | null> {
     return parseNFTSaleOnTx(web3Conn, txResp, this);
   },

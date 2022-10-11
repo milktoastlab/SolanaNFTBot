@@ -7,6 +7,7 @@ const openSea: Marketplace = {
   iconURL:
     "https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png",
   itemURL: (token: String) => `https://opensea.io/assets/solana/${token}`,
+  profileURL: (address: String) => `https://opensea.io/${address}`,
   parseNFTSale(web3Conn, txResp): Promise<NFTSale | null> {
     return parseNFTSaleOnTx(web3Conn, txResp, this);
   },
