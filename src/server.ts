@@ -1,16 +1,17 @@
 import express from "express";
-import {
-  initClient as initDiscordClient,
-} from "lib/discord";
+import { initClient as initDiscordClient } from "lib/discord";
 import initWorkers from "workers/initWorkers";
-import { newConnection } from "lib/solana/connection";
+import {
+  maxSupportedTransactionVersion,
+  newConnection,
+} from "lib/solana/connection";
 import dotenv from "dotenv";
 import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
-import {Env, loadConfig} from "config";
+import { Env, loadConfig } from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
 import { parseNFTSale } from "lib/marketplaces";
-import { ParsedConfirmedTransaction } from "@solana/web3.js";
+import { ParsedTransactionWithMeta } from "@solana/web3.js";
 import notifyTwitter from "lib/twitter/notifyTwitter";
 import logger from "lib/logger";
 import { newNotifierFactory } from "lib/notifier";
@@ -25,7 +26,7 @@ import queue from "queue";
     }
 
     const config = loadConfig(process.env as Env);
-    const {subscriptions} = config;
+    const { subscriptions } = config;
     const port = process.env.PORT || 4000;
 
     const web3Conn = newConnection();
@@ -62,9 +63,12 @@ import queue from "queue";
         return;
       }
 
-      let tx: ParsedConfirmedTransaction | null = null;
+      let tx: ParsedTransactionWithMeta | null = null;
       try {
-        tx = await web3Conn.getParsedConfirmedTransaction(signature);
+        tx = await web3Conn.getParsedTransaction(signature, {
+          commitment: "finalized",
+          maxSupportedTransactionVersion,
+        });
       } catch (e) {
         logger.log(e);
         res.send(`Get transaction failed, check logs for error.`);
@@ -106,7 +110,7 @@ import queue from "queue";
     });
 
     if (!subscriptions.length) {
-      logger.warn('No subscriptions loaded');
+      logger.warn("No subscriptions loaded");
       return;
     }
 

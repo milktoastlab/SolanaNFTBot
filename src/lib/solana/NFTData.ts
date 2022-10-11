@@ -1,6 +1,5 @@
-import { Creator, Metadata } from "@metaplex/js";
-import axios from "axios";
-import { Connection } from "@solana/web3.js";
+import { Metaplex } from "@metaplex-foundation/js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import logger from "lib/logger";
 
 export default interface NFTData {
@@ -8,19 +7,29 @@ export default interface NFTData {
   symbol: string;
   image: string;
   sellerFeeBasisPoints: number;
-  creators: Creator[];
 }
 
 export async function fetchNFTData(
   web3Conn: Connection,
   token: string
 ): Promise<NFTData | undefined> {
+  const metaplex = new Metaplex(web3Conn);
+
   try {
-    const metadata = await Metadata.load(
-      web3Conn,
-      await Metadata.getPDA(token)
-    );
-    return (await axios.get<NFTData>(metadata.data.data.uri)).data;
+    const metadata = await metaplex.nfts().findByMint({
+      mintAddress: new PublicKey(token),
+      loadJsonMetadata: true,
+    });
+    if (!metadata.json) {
+      return;
+    }
+
+    return {
+      name: metadata.json.name || "",
+      symbol: metadata.json.symbol || "",
+      image: metadata.json.image || "",
+      sellerFeeBasisPoints: metadata.json.seller_fee_basis_points || 0,
+    };
   } catch (e) {
     logger.error("fetch NFT data failed", e);
   }
