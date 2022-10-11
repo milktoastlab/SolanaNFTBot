@@ -17,8 +17,9 @@ export async function fetchNFTData(
   const metaplex = new Metaplex(web3Conn);
 
   try {
-    const metadata = await metaplex.nfts().findByToken({
-      token: new PublicKey(token),
+    const metadata = await metaplex.nfts().findByMint({
+      mintAddress: new PublicKey(token),
+      loadJsonMetadata: true,
     });
     if (!metadata.json) {
       return;

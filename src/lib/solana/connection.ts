@@ -6,7 +6,7 @@ import {
   PublicKey,
 } from "@solana/web3.js";
 
-const maxSupportedTransactionVersion = 2;
+export const maxSupportedTransactionVersion = 2;
 
 export function newConnection(): Connection {
   const config: ConnectionConfig = {};
