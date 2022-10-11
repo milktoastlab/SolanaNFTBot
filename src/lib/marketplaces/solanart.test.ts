@@ -19,9 +19,7 @@ describe("solanart", () => {
   const conn = new Connection("https://test/");
 
   test("itemUrl", () => {
-    expect(solanart.itemURL("xxx1")).toEqual(
-      "https://solanart.io/search/?token=xxx1"
-    );
+    expect(solanart.itemURL("xxx1")).toEqual("https://solanart.io/nft/xxx1");
   });
 
   describe("parseNFTSale", () => {
