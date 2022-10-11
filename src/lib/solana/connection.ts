@@ -2,9 +2,11 @@ import {
   ConfirmedSignaturesForAddress2Options,
   Connection,
   ConnectionConfig,
-  ParsedConfirmedTransaction,
+  ParsedTransactionWithMeta,
   PublicKey,
 } from "@solana/web3.js";
+
+const maxSupportedTransactionVersion = 2;
 
 export function newConnection(): Connection {
   const config: ConnectionConfig = {};
@@ -15,14 +17,14 @@ export function newConnection(): Connection {
 }
 
 interface Opt extends ConfirmedSignaturesForAddress2Options {
-  onTransaction?: (tx: ParsedConfirmedTransaction) => Promise<void>;
+  onTransaction?: (tx: ParsedTransactionWithMeta) => Promise<void>;
 }
 
 export async function fetchWeb3Transactions(
   conn: Connection,
   account: string,
   opt?: Opt
-): Promise<ParsedConfirmedTransaction[] | null> {
+): Promise<ParsedTransactionWithMeta[] | null> {
   const signatures = await conn.getConfirmedSignaturesForAddress2(
     new PublicKey(account),
     {
@@ -30,16 +32,19 @@ export async function fetchWeb3Transactions(
       before: opt?.before,
       until: opt?.until,
     },
-    'finalized'
+    "finalized"
   );
 
   if (signatures) {
-    const txs: ParsedConfirmedTransaction[] = [];
+    const txs: ParsedTransactionWithMeta[] = [];
     const oldestToLatest = signatures.reverse();
 
     for (let i = 0; i < oldestToLatest.length; i++) {
       const signature = oldestToLatest[i];
-      const tx = await conn.getParsedConfirmedTransaction(signature.signature);
+      const tx = await conn.getParsedTransaction(signature.signature, {
+        commitment: "finalized",
+        maxSupportedTransactionVersion,
+      });
       if (!tx) {
         continue;
       }
