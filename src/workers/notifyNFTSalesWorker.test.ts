@@ -36,14 +36,12 @@ describe("notifyNFTSalesWorker", () => {
           } as ConfirmedSignatureInfo,
         ];
       });
-    jest
-      .spyOn(conn, "getParsedConfirmedTransaction")
-      .mockImplementation(async () => {
-        return {
-          ...solanartSaleTx,
-          blockTime: Date.now() + 1000000,
-        };
-      });
+    jest.spyOn(conn, "getParsedTransaction").mockImplementation(async () => {
+      return {
+        ...solanartSaleTx,
+        blockTime: Date.now() + 1000000,
+      };
+    });
 
     test("on solanart tx", async () => {
       const project: Project = {
