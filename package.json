@@ -23,7 +23,7 @@
     "@solana/web3.js": "^1.64.0",
     "axios": "^0.25.0",
     "discord.js": "^13.2.0",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "file-type": "16.5.4",
     "queue": "^6.0.2",
