@@ -13,11 +13,18 @@ interface TwitterConfig {
   accessSecret: string;
 }
 
+export interface MagicEdenConfig {
+  url: string;
+  collection: string;
+  discordChannelId: string;
+}
+
 export interface Config {
   twitter: TwitterConfig;
   discordBotToken: string;
   queueConcurrency: number;
   subscriptions: Subscription[];
+  magicEdenConfig: MagicEdenConfig;
 }
 
 export type Env = { [key: string]: string };
@@ -76,6 +83,11 @@ export function loadConfig(env: Env): MutableConfig {
     discordBotToken: env.DISCORD_BOT_TOKEN || "",
     queueConcurrency: parseInt(env.QUEUE_CONCURRENCY || "2", 10),
     subscriptions: loadSubscriptions(env),
+    magicEdenConfig: {
+      url: env.MAGIC_EDEN_URL || "",
+      collection: env.MAGIC_EDEN_COLLECTION || "",
+      discordChannelId: env.MAGIC_EDEN_DISCORD_CHANNEL_ID || "",
+    },
   };
 
   return {

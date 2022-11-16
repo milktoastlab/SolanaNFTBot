@@ -1,5 +1,5 @@
 import { Marketplace, NFTSale } from "./types";
-import { parseNFTSaleOnTx } from "./helper";
+import { parseNFTSaleOnTx } from "lib/marketplaces/helper";
 
 const magicEden: Marketplace = {
   name: "Magic Eden",
@@ -10,6 +10,8 @@ const magicEden: Marketplace = {
   iconURL: "https://www.magiceden.io/img/favicon.png",
   itemURL: (token: String) => `https://magiceden.io/item-details/${token}`,
   profileURL: (address: String) => `https://magiceden.io/u/${address}`,
+  // Deprecated MagicEden doesn't work with the existing ways of parsing NFT sales
+  // Detecting MagicEden now happens via their API
   parseNFTSale(web3Conn, txResp): Promise<NFTSale | null> {
     return parseNFTSaleOnTx(web3Conn, txResp, this);
   },

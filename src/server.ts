@@ -10,6 +10,7 @@ import notifyDiscordSale, { getStatus } from "lib/discord/notifyDiscordSale";
 import { Env, loadConfig } from "config";
 import { Worker } from "workers/types";
 import notifyNFTSalesWorker from "workers/notifyNFTSalesWorker";
+import notifyMagicEdenNFTSalesWorker from "workers/notifyMagicEdenNFTSalesWorker";
 import { parseNFTSale } from "lib/marketplaces";
 import { ParsedTransactionWithMeta } from "@solana/web3.js";
 import notifyTwitter from "lib/twitter/notifyTwitter";
@@ -109,19 +110,31 @@ import queue from "queue";
       logger.log(`Ready on http://localhost:${port}`);
     });
 
-    if (!subscriptions.length) {
-      logger.warn("No subscriptions loaded");
-      return;
+    let workers: Worker[] = [];
+    if (subscriptions.length) {
+      workers = subscriptions.map((s) => {
+        const project = {
+          discordChannelId: s.discordChannelId,
+          mintAddress: s.mintAddress,
+        };
+        const notifier = notifierFactory.create(project);
+        return notifyNFTSalesWorker(notifier, web3Conn, project);
+      });
     }
 
-    const workers: Worker[] = subscriptions.map((s) => {
-      const project = {
-        discordChannelId: s.discordChannelId,
-        mintAddress: s.mintAddress,
-      };
-      const notifier = notifierFactory.create(project);
-      return notifyNFTSalesWorker(notifier, web3Conn, project);
-    });
+    if (config.magicEdenConfig.collection) {
+      const notifier = notifierFactory.create({
+        discordChannelId: config.magicEdenConfig?.discordChannelId,
+        mintAddress: "",
+      });
+      workers.push(
+        notifyMagicEdenNFTSalesWorker(
+          notifier,
+          web3Conn,
+          config.magicEdenConfig
+        )
+      );
+    }
 
     const _ = initWorkers(workers, () => {
       // Add randomness between worker executions so the requests are not made all at once

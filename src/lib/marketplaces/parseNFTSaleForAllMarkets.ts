@@ -7,7 +7,11 @@ export default async function parseNFTSaleForAllMarkets(
   tx: ParsedConfirmedTransaction
 ): Promise<NFTSale | null> {
   for (let i = 0; i < marketplaces.length; i++) {
-    const nftSale = await marketplaces[i].parseNFTSale(web3Conn, tx);
+    const marketplace = marketplaces[i];
+    if (!marketplace.parseNFTSale) {
+      continue;
+    }
+    const nftSale = await marketplace.parseNFTSale(web3Conn, tx);
     if (nftSale) {
       return nftSale;
     }
