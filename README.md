@@ -110,6 +110,12 @@ TWITTER_API_KEY=
 TWITTER_API_KEY_SECRET=
 TWITTER_ACCESS_TOKEN=
 TWITTER_ACCESS_TOKEN_SECRET=
+# Magic eden API
+MAGIC_EDEN_URL=https://api-mainnet.magiceden.dev/v2
+# Enter the NFT collection that you want to track
+MAGIC_EDEN_COLLECTION=
+# The discord channel to notify
+MAGIC_EDEN_DISCORD_CHANNEL_ID=
 ```
 https://github.com/milktoastlab/SolanaNFTBot/blob/main/.env
 
@@ -171,6 +177,24 @@ The API Key and secret will be displayed to you there, which you'll assign to `T
 Then, click on the Keys and tokens tab, and generate the Access Token and Secret. Assign these to `TWITTER_ACCESS_TOKEN` and `TWITTER_ACCESS_TOKEN_SECRET` respectively.
 
 <img src= https://user-images.githubusercontent.com/50549441/149973388-58f3a303-91f4-4e1b-ab7f-dfc2a22aa5da.png>
+
+### Magic Eden variables
+Magic eden's NFT trading program has changed to V2, which means the old way of detecting sales won't work anymore. We have updated the bot to use the new API to detect sales.  
+To enable this feature, you will need to add the following variables to your `.env` file:
+
+__MAGIC_EDEN_COLLECTION__ 
+
+This is the collection key to magic eden. To find our what it is, navigate to the collection page and look at the url. It should be the last part of the url.
+```
+Example:
+https://magiceden.io/marketplace/milktoast
+```
+The collection key is "milktoast"
+
+__MAGIC_EDEN_DISCORD_CHANNEL_ID__
+
+This is the discord channel to notify. Same as `SUBSCRIPTION_DISCORD_CHANNEL_ID` but it doesn't support multiple channels at the moment.
+
 
 ## Production deployment
 

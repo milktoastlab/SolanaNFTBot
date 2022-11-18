@@ -1,4 +1,5 @@
 import { Connection, ParsedConfirmedTransaction } from "@solana/web3.js";
+import { MagicEdenConfig } from "config";
 import NFTData from "lib/solana/NFTData";
 
 export enum SaleMethod {
@@ -12,7 +13,7 @@ export interface Marketplace {
   iconURL: string;
   itemURL: (token: String) => string;
   profileURL: (address: String) => string;
-  parseNFTSale: (
+  parseNFTSale?: (
     web3Conn: Connection,
     tx: ParsedConfirmedTransaction
   ) => Promise<NFTSale | null>;

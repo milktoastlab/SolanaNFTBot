@@ -22,13 +22,11 @@ describe("parseNFTSale", () => {
 
   test("sale transaction should return NFTSale", async () => {
     const tests = [
-      magicEdenSaleTx,
       digitalEyeSaleTx,
       solanartSaleTx,
       alphaArtSaleTx,
       exchangeArtSaleTx,
       solseaSaleTx,
-      magicEdenSaleTxV2,
       openSeaSaleTx,
     ].map(async (tx) => {
       const sale = await parseNFTSaleForAllMarkets(conn, tx);
