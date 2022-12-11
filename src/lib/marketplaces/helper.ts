@@ -203,12 +203,15 @@ export async function parseNFTSaleOnTx(
   transferInstructionIndex?: number
 ): Promise<NFTSale | null> {
   if (!txResp?.blockTime) {
+    logger.log("no blocktime")
     return null;
   }
   if (!txResp.meta) {
+    logger.log("no meta")
     return null;
   }
   if (txResp.meta.err) {
+    logger.log("meta error")
     return null;
   }
 
