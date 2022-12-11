@@ -11,6 +11,7 @@ import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
 import { fetchNFTData } from "../solana/NFTData";
 import solanart from "./solanart";
+import logger from "lib/logger";
 
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
@@ -215,14 +216,14 @@ export async function parseNFTSaleOnTx(
     return k.signer;
   });
   if (!signer) {
-    console.log("no signer")
+    logger.log("no signer")
     return null;
   }
   const signerAddress = signer.pubkey.toString();
 
   // A sale transaction should move the token from one account to another
   if (!wasTokenMovedInTx(txResp)) {
-    console.log("token not moved")
+    logger.log("token not moved")
     return null;
   }
 
@@ -241,7 +242,7 @@ export async function parseNFTSaleOnTx(
     marketplace.programId
   );
   if (!transactionExecByMarketplaceProgram) {
-    console.log("did not contain txn log")
+    logger.log("did not contain txn log")
     return null;
   }
 
