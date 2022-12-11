@@ -48,11 +48,10 @@ import queue from "queue";
           `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
       )}
       Total notifications sent: ${totalNotified}<br/>
-      ${
-        lastNotified
+      ${lastNotified
           ? `Last notified at: ${lastNotified.toISOString()}<br/>`
           : ""
-      }
+        }
       ${`Current UTC time: ${new Date().toISOString()}`}
       `);
     });
@@ -70,6 +69,7 @@ import queue from "queue";
           commitment: "finalized",
           maxSupportedTransactionVersion,
         });
+        logger.log(tx);
       } catch (e) {
         logger.log(e);
         res.send(`Get transaction failed, check logs for error.`);
