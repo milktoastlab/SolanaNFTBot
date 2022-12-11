@@ -67,10 +67,9 @@ import { sign } from "crypto";
       let tx: ParsedTransactionWithMeta | null = null;
       try {
         tx = await web3Conn.getParsedTransaction(signature, {
-          commitment: "finalized",
+          commitment: "confirmed",
           maxSupportedTransactionVersion,
         });
-        logger.log(signature)
         logger.log(tx);
       } catch (e) {
         logger.log(e);
