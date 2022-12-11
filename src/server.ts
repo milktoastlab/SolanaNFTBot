@@ -18,6 +18,7 @@ import logger from "lib/logger";
 import { newNotifierFactory } from "lib/notifier";
 import initTwitterClient from "lib/twitter";
 import queue from "queue";
+import { sign } from "crypto";
 
 (async () => {
   try {
@@ -69,6 +70,7 @@ import queue from "queue";
           commitment: "finalized",
           maxSupportedTransactionVersion,
         });
+        logger.log(signature)
         logger.log(tx);
       } catch (e) {
         logger.log(e);
