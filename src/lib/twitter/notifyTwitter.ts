@@ -1,17 +1,15 @@
 import TwitterAPI from "twitter-api-v2";
 import { NFTSale, SaleMethod } from "lib/marketplaces";
 import axios from "axios";
-
+import logger from "lib/logger";
 export default async function notifyTwitter(
   twitterClient: TwitterAPI,
   nftSale: NFTSale
 ) {
   const nftName = nftSale.nftData?.name;
-  const text = `${nftName} has just been sold ${
-    nftSale.method === SaleMethod.Bid ? "via bidding " : ""
-  }for ${nftSale.getPriceInSOL()} S◎L at ${
-    nftSale.marketplace.name
-  }! #SolanaNFTs #NFTSale`;
+  const text = `${nftName} has just been sold ${nftSale.method === SaleMethod.Bid ? "via bidding " : ""
+    }for ${nftSale.getPriceInSOL()} S◎L at ${nftSale.marketplace.name
+    }! #SolanaNFTs #NFTSale`;
 
   const mediaArr: string[] = [];
   if (Boolean(nftSale.nftData?.image)) {
@@ -21,9 +19,11 @@ export default async function notifyTwitter(
     });
     mediaArr.push(media);
   }
-  return twitterClient.v1.tweet(text, {
+  const tweetResults = twitterClient.v1.tweet(text, {
     media_ids: mediaArr,
   });
+  logger.log(tweetResults)
+  return tweetResults;
 }
 
 async function getDataType(buffer: Buffer) {
