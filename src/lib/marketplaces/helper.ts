@@ -16,7 +16,7 @@ import logger from "lib/logger";
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
 ): Transfer[] {
-  logger.log("entering get transfer from inner instructions")
+
   if (!innerInstructions) {
     return [];
   }
@@ -47,10 +47,10 @@ function txContainsLog(
   values: string[]
 ): boolean {
   if (!tx.meta?.logMessages) {
-    logger.log("logmessages is null")
+
     return false;
   }
-  logger.log("marketplace programids " + values)
+
   return Boolean(
     tx.meta.logMessages.find((msg) => {
       return Boolean(values.find((value) => msg.includes(value)));
@@ -130,13 +130,13 @@ function getTokenDestinationFromTx(
 function getTokenFromMeta(
   meta: ParsedConfirmedTransactionMeta
 ): string | undefined {
-  logger.log("entering getTokenFromMeta")
+
   if (meta.preTokenBalances && meta.preTokenBalances[0]?.mint) {
-    logger.log("preToken entered")
+
     return meta.preTokenBalances[0]?.mint;
   }
   if (meta.postTokenBalances && meta.postTokenBalances[0]?.mint) {
-    logger.log("postToken entered")
+
     return meta.postTokenBalances[0]?.mint;
   }
   return;
@@ -193,15 +193,15 @@ function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
 function findLargestInnerInstructionIndex(
   innerInstructions: ParsedInnerInstruction[]
 ) {
-  logger.log(innerInstructions)
+
   return innerInstructions.reduce((prevIndex, current, currentIndex) => {
     const prevInstruction = innerInstructions[prevIndex];
-    logger.log(prevInstruction)
+
     if (current.instructions.length > prevInstruction.instructions.length) {
-      logger.log(currentIndex)
+
       return currentIndex;
     }
-    logger.log(prevIndex)
+
     return prevIndex;
   }, 0);
 }
@@ -213,15 +213,15 @@ export async function parseNFTSaleOnTx(
   transferInstructionIndex?: number
 ): Promise<NFTSale | null> {
   if (!txResp?.blockTime) {
-    logger.log("no blocktime")
+
     return null;
   }
   if (!txResp.meta) {
-    logger.log("no meta")
+
     return null;
   }
   if (txResp.meta.err) {
-    logger.log("meta error")
+
     return null;
   }
 
@@ -229,14 +229,14 @@ export async function parseNFTSaleOnTx(
     return k.signer;
   });
   if (!signer) {
-    logger.log("no signer")
+
     return null;
   }
   const signerAddress = signer.pubkey.toString();
 
   // A sale transaction should move the token from one account to another
   if (!wasTokenMovedInTx(txResp)) {
-    logger.log("token not moved")
+
     return null;
   }
 
@@ -255,7 +255,7 @@ export async function parseNFTSaleOnTx(
     marketplace.programId
   );
   if (!transactionExecByMarketplaceProgram) {
-    logger.log("did not contain txn log")
+
     return null;
   }
 
@@ -263,28 +263,28 @@ export async function parseNFTSaleOnTx(
     meta: { innerInstructions },
   } = txResp;
   if (!innerInstructions) {
-    logger.log("did not contain inner instructions")
+
     return null;
   }
 
   if (typeof transferInstructionIndex == "undefined") {
-    logger.log("entering findLargestInnerInstructionIndex")
+
     transferInstructionIndex =
       findLargestInnerInstructionIndex(innerInstructions);
   }
   if (innerInstructions.length < transferInstructionIndex + 1) {
-    logger.log("entering innerInstructions.length < transferInstructionIndex + 1")
+
     return null;
   }
 
   const token = getTokenFromMeta(txResp.meta);
   if (!token) {
-    logger.log("token was null")
+
     return null;
   }
   const nftData = await fetchNFTData(web3Conn, token);
   if (!nftData) {
-    logger.log("nft data was null")
+
     return null;
   }
   let priceInLamport = 0;
@@ -304,18 +304,13 @@ export async function parseNFTSaleOnTx(
       );
     }
   }
-  // else if (transfers.length === 1) {
-  //   logger.log("enter transfer length === 1")
-  //   // There should be more than one transfers as all NFT contains royalties and seller revenue
-  //   return null;
-  // } 
   else {
     priceInLamport = transfers.reduce<number>((prev, current) => {
       return prev + current.revenue.amount;
     }, 0);
   }
   if (!priceInLamport) {
-    logger.log("no price in lamport")
+
     return null;
   }
 
