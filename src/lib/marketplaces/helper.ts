@@ -129,10 +129,13 @@ function getTokenDestinationFromTx(
 function getTokenFromMeta(
   meta: ParsedConfirmedTransactionMeta
 ): string | undefined {
+  logger.log("entering getTokenFromMeta")
   if (meta.preTokenBalances && meta.preTokenBalances[0]?.mint) {
+    logger.log("preToken entered")
     return meta.preTokenBalances[0]?.mint;
   }
   if (meta.postTokenBalances && meta.postTokenBalances[0]?.mint) {
+    logger.log("postToken entered")
     return meta.postTokenBalances[0]?.mint;
   }
   return;
@@ -189,11 +192,15 @@ function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
 function findLargestInnerInstructionIndex(
   innerInstructions: ParsedInnerInstruction[]
 ) {
+  logger.log(innerInstructions)
   return innerInstructions.reduce((prevIndex, current, currentIndex) => {
     const prevInstruction = innerInstructions[prevIndex];
+    logger.log(prevInstruction)
     if (current.instructions.length > prevInstruction.instructions.length) {
+      logger.log(currentIndex)
       return currentIndex;
     }
+    logger.log(prevIndex)
     return prevIndex;
   }, 0);
 }
