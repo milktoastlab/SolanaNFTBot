@@ -70,7 +70,6 @@ import { sign } from "crypto";
           commitment: "confirmed",
           maxSupportedTransactionVersion,
         });
-        logger.log(tx);
       } catch (e) {
         logger.log(e);
         res.send(`Get transaction failed, check logs for error.`);
