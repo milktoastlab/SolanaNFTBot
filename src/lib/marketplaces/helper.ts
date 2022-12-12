@@ -303,11 +303,13 @@ export async function parseNFTSaleOnTx(
         buyer
       );
     }
-  } else if (transfers.length === 1) {
-    logger.log("enter transfer length === 1")
-    // There should be more than one transfers as all NFT contains royalties and seller revenue
-    return null;
-  } else {
+  }
+  // else if (transfers.length === 1) {
+  //   logger.log("enter transfer length === 1")
+  //   // There should be more than one transfers as all NFT contains royalties and seller revenue
+  //   return null;
+  // } 
+  else {
     priceInLamport = transfers.reduce<number>((prev, current) => {
       return prev + current.revenue.amount;
     }, 0);
