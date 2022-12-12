@@ -16,6 +16,7 @@ import logger from "lib/logger";
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
 ): Transfer[] {
+  logger.log("entering get transfer from inner instructions")
   if (!innerInstructions) {
     return [];
   }
@@ -303,6 +304,7 @@ export async function parseNFTSaleOnTx(
       );
     }
   } else if (transfers.length === 1) {
+    logger.log("enter transfer length === 1")
     // There should be more than one transfers as all NFT contains royalties and seller revenue
     return null;
   } else {
@@ -311,6 +313,7 @@ export async function parseNFTSaleOnTx(
     }, 0);
   }
   if (!priceInLamport) {
+    logger.log("no price in lamport")
     return null;
   }
 
