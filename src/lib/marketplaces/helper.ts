@@ -46,8 +46,10 @@ function txContainsLog(
   values: string[]
 ): boolean {
   if (!tx.meta?.logMessages) {
+    logger.log("logmessages is null")
     return false;
   }
+  logger.log("marketplace programids " + values)
   return Boolean(
     tx.meta.logMessages.find((msg) => {
       return Boolean(values.find((value) => msg.includes(value)));
