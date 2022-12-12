@@ -255,23 +255,28 @@ export async function parseNFTSaleOnTx(
     meta: { innerInstructions },
   } = txResp;
   if (!innerInstructions) {
+    logger.log("did not contain inner instructions")
     return null;
   }
 
   if (typeof transferInstructionIndex == "undefined") {
+    logger.log("entering findLargestInnerInstructionIndex")
     transferInstructionIndex =
       findLargestInnerInstructionIndex(innerInstructions);
   }
   if (innerInstructions.length < transferInstructionIndex + 1) {
+    logger.log("entering innerInstructions.length < transferInstructionIndex + 1")
     return null;
   }
 
   const token = getTokenFromMeta(txResp.meta);
   if (!token) {
+    logger.log("token was null")
     return null;
   }
   const nftData = await fetchNFTData(web3Conn, token);
   if (!nftData) {
+    logger.log("nft data was null")
     return null;
   }
   let priceInLamport = 0;
