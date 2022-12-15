@@ -49,9 +49,9 @@ View logs
 docker logs ntfbot
 ```
 
-To make sure the bot is working properly, use [/test-sale-tx](src/server.ts#L47) endpoint
+To make sure the bot is working properly, use [/test-sale-tx](src/server.ts#L47) endpoint. Remove Tweet=true off of the end if you do not want to test twitter functionality
 ```
-curl "http://localhost:4000/test-sale-tx?signature={sale_transaction_signature}&channelId={discord_channel_id}"
+curl "http://localhost:4000/test-sale-tx?signature={sale_transaction_signature}&channelId={discord_channel_id}&tweet=true"
 ```
 
 In case of *DiscordAPIError: Missing Access* error, check if the bot has been invited to the channel. Go to the channel, click "Add members or roles" and add your bot account as a member.

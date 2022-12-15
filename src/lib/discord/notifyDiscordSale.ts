@@ -37,13 +37,11 @@ export default async function notifyDiscordSale(
     return;
   }
 
-  const method = `Sold${
-    nftSale.method === SaleMethod.Bid ? " via bidding" : ""
-  }`;
+  const method = `Sold${nftSale.method === SaleMethod.Bid ? " via bidding" : ""
+    }`;
 
-  const description = `${method} for ${nftSale.getPriceInSOL()} S◎L on ${
-    marketplace.name
-  }`;
+  const description = `${method} for ${nftSale.getPriceInSOL()} S◎L on ${marketplace.name
+    }`;
 
   const actionRowMsg = new MessageActionRow({
     type: 1,
@@ -73,9 +71,8 @@ export default async function notifyDiscordSale(
     fields: [
       {
         name: "Price",
-        value: `${nftSale.getPriceInSOL().toFixed(2)} S◎L ${
-          nftSale.method === SaleMethod.Bid ? "(Via bidding)" : ""
-        }`,
+        value: `${nftSale.getPriceInSOL().toFixed(2)} S◎L ${nftSale.method === SaleMethod.Bid ? "(Via bidding)" : ""
+          }`,
         inline: false,
       },
       {
@@ -103,10 +100,11 @@ export default async function notifyDiscordSale(
     },
   });
 
-  await channel.send({
+  const channelSend = await channel.send({
     components: [actionRowMsg],
     embeds: [embedMsg],
   });
+  logger.log(channelSend)
   const logMsg = `Notified discord #${channel.name}: ${nftData.name} - ${description}`;
   logger.log(logMsg);
 

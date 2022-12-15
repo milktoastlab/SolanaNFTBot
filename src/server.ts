@@ -18,6 +18,7 @@ import logger from "lib/logger";
 import { newNotifierFactory } from "lib/notifier";
 import initTwitterClient from "lib/twitter";
 import queue from "queue";
+import { sign } from "crypto";
 
 (async () => {
   try {
@@ -48,11 +49,10 @@ import queue from "queue";
           `Watching the address ${s.mintAddress} at discord channel #${s.discordChannelId} for NFT sales.<br/>`
       )}
       Total notifications sent: ${totalNotified}<br/>
-      ${
-        lastNotified
+      ${lastNotified
           ? `Last notified at: ${lastNotified.toISOString()}<br/>`
           : ""
-      }
+        }
       ${`Current UTC time: ${new Date().toISOString()}`}
       `);
     });
@@ -67,7 +67,7 @@ import queue from "queue";
       let tx: ParsedTransactionWithMeta | null = null;
       try {
         tx = await web3Conn.getParsedTransaction(signature, {
-          commitment: "finalized",
+          commitment: "confirmed",
           maxSupportedTransactionVersion,
         });
       } catch (e) {

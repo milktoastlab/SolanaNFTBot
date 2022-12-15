@@ -11,10 +11,12 @@ import { Marketplace, NFTSale, SaleMethod, Transfer } from "./types";
 import { LamportPerSOL } from "../solana";
 import { fetchNFTData } from "../solana/NFTData";
 import solanart from "./solanart";
+import logger from "lib/logger";
 
 export function getTransfersFromInnerInstructions(
   innerInstructions: any
 ): Transfer[] {
+
   if (!innerInstructions) {
     return [];
   }
@@ -45,8 +47,10 @@ function txContainsLog(
   values: string[]
 ): boolean {
   if (!tx.meta?.logMessages) {
+
     return false;
   }
+
   return Boolean(
     tx.meta.logMessages.find((msg) => {
       return Boolean(values.find((value) => msg.includes(value)));
@@ -126,10 +130,13 @@ function getTokenDestinationFromTx(
 function getTokenFromMeta(
   meta: ParsedConfirmedTransactionMeta
 ): string | undefined {
+
   if (meta.preTokenBalances && meta.preTokenBalances[0]?.mint) {
+
     return meta.preTokenBalances[0]?.mint;
   }
   if (meta.postTokenBalances && meta.postTokenBalances[0]?.mint) {
+
     return meta.postTokenBalances[0]?.mint;
   }
   return;
@@ -186,11 +193,15 @@ function guessSellerByTransfers(transfers: Transfer[]): string | undefined {
 function findLargestInnerInstructionIndex(
   innerInstructions: ParsedInnerInstruction[]
 ) {
+
   return innerInstructions.reduce((prevIndex, current, currentIndex) => {
     const prevInstruction = innerInstructions[prevIndex];
+
     if (current.instructions.length > prevInstruction.instructions.length) {
+
       return currentIndex;
     }
+
     return prevIndex;
   }, 0);
 }
@@ -202,12 +213,15 @@ export async function parseNFTSaleOnTx(
   transferInstructionIndex?: number
 ): Promise<NFTSale | null> {
   if (!txResp?.blockTime) {
+
     return null;
   }
   if (!txResp.meta) {
+
     return null;
   }
   if (txResp.meta.err) {
+
     return null;
   }
 
@@ -215,12 +229,14 @@ export async function parseNFTSaleOnTx(
     return k.signer;
   });
   if (!signer) {
+
     return null;
   }
   const signerAddress = signer.pubkey.toString();
 
   // A sale transaction should move the token from one account to another
   if (!wasTokenMovedInTx(txResp)) {
+
     return null;
   }
 
@@ -239,6 +255,7 @@ export async function parseNFTSaleOnTx(
     marketplace.programId
   );
   if (!transactionExecByMarketplaceProgram) {
+
     return null;
   }
 
@@ -246,23 +263,28 @@ export async function parseNFTSaleOnTx(
     meta: { innerInstructions },
   } = txResp;
   if (!innerInstructions) {
+
     return null;
   }
 
   if (typeof transferInstructionIndex == "undefined") {
+
     transferInstructionIndex =
       findLargestInnerInstructionIndex(innerInstructions);
   }
   if (innerInstructions.length < transferInstructionIndex + 1) {
+
     return null;
   }
 
   const token = getTokenFromMeta(txResp.meta);
   if (!token) {
+
     return null;
   }
   const nftData = await fetchNFTData(web3Conn, token);
   if (!nftData) {
+
     return null;
   }
   let priceInLamport = 0;
@@ -281,15 +303,14 @@ export async function parseNFTSaleOnTx(
         buyer
       );
     }
-  } else if (transfers.length === 1) {
-    // There should be more than one transfers as all NFT contains royalties and seller revenue
-    return null;
-  } else {
+  }
+  else {
     priceInLamport = transfers.reduce<number>((prev, current) => {
       return prev + current.revenue.amount;
     }, 0);
   }
   if (!priceInLamport) {
+
     return null;
   }
 
